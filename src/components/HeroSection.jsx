@@ -27,25 +27,25 @@ import img4 from "../assets/doctor.jpg";
 const slides = [
   {
     img: img1,
-    subtitle: "Find. Connect. Grow.",
+    subtitle: " ",
     title: "Manufacturing Success",
     desc: "Discover verified manufacturers, bulk suppliers, industrial partners, and trusted exporters. Expand your production capabilities and grow your business faster with reliable B2B connections.",
   },
   {
     img: img2,
-    subtitle: "Professional Solutions",
+    subtitle: " ",
     title: "Expert Services",
     desc: "Connect with experienced service providers, consultants, and professionals. From logistics to digital services, streamline your operations and maximize efficiency.",
   },
   {
     img: img3,
-    subtitle: "Smart Machinery",
+    subtitle: " ",
     title: "Paper Cup Machines",
     desc: "Explore high-performance paper cup machines and automatic production units. Get the best deals and boost your manufacturing output efficiently.",
   },
   {
     img: img4,
-    subtitle: "Healthcare Network",
+    subtitle: " ",
     title: "Doctor & Medical Services",
     desc: "Find trusted doctors, clinics, and healthcare professionals. Access reliable medical services and expert consultations easily.",
   },
