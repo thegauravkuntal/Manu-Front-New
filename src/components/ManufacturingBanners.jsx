@@ -7,28 +7,28 @@ const DEFAULT_BANNERS = [
     _id: "banner-1",
     title: "Industrial Machinery Deals",
     image:
-      "https://res.cloudinary.com/djsxaigna/image/upload/v1778687629/manufacturing_b2b/tiwud4hv6wtvt4cbgozz.jpg",
+      "https://res.cloudinary.com/djsxaigna/image/upload/v1780558944/manu_uploads/p7hxxb7pazd11vua1mzs.webp",
     link: "/manufacturing",
   },
   {
     _id: "banner-2",
     title: "Packaging Equipment",
     image:
-      "https://res.cloudinary.com/djsxaigna/image/upload/v1778687629/manufacturing_b2b/tiwud4hv6wtvt4cbgozz.jpg",
+      "https://res.cloudinary.com/djsxaigna/image/upload/v1780558944/manu_uploads/imhf98htd80dhwicn4ib.jpg",
     link: "/packaging",
   },
   {
     _id: "banner-3",
     title: "Verified Suppliers",
     image:
-      "https://res.cloudinary.com/djsxaigna/image/upload/v1779526091/manu_uploads/oju73iddjm2mbnw3oxte.jpg",
+      "https://res.cloudinary.com/djsxaigna/image/upload/v1780558943/manu_uploads/aevp74lo3q6jguvbr0u8.jpg",
     link: "/all-products",
   },
   {
     _id: "banner-4",
     title: "Direct Supplier Contact",
     image:
-      "https://res.cloudinary.com/djsxaigna/image/upload/v1778687629/manufacturing_b2b/tiwud4hv6wtvt4cbgozz.jpg",
+      "https://res.cloudinary.com/djsxaigna/image/upload/v1780558943/manu_uploads/v90vmvcfstj3yqbdfopn.jpg",
     link: "/all-products",
   },
 ];

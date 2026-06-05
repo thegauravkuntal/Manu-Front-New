@@ -4,6 +4,9 @@ import { API_BASE_URL } from "../api/config";
 
 const PartnerLoginModal = ({ isOpen, onClose, initialMode = 'signup' }) => {
   const [isLogin, setIsLogin] = useState(initialMode === 'login');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSent, setForgotSent] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,6 +18,9 @@ const PartnerLoginModal = ({ isOpen, onClose, initialMode = 'signup' }) => {
   useEffect(() => {
     if (isOpen) {
       setIsLogin(initialMode === 'login');
+      setShowForgotPassword(false);
+      setForgotSent(false);
+      setForgotEmail('');
     }
   }, [initialMode, isOpen]);
 
@@ -41,7 +47,7 @@ const PartnerLoginModal = ({ isOpen, onClose, initialMode = 'signup' }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, role: 'partner' }),
       });
 
       const data = await response.json();
@@ -62,6 +68,29 @@ const PartnerLoginModal = ({ isOpen, onClose, initialMode = 'signup' }) => {
     } catch (err) {
       console.error(err);
       alert('Something went wrong ❌');
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.msg || 'Failed to send reset email');
+      } else {
+        setForgotSent(true);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong ❌');
+    } finally {
       setLoading(false);
     }
   };
@@ -121,110 +150,178 @@ const PartnerLoginModal = ({ isOpen, onClose, initialMode = 'signup' }) => {
 
         {/* Right Side: Form */}
         <div className="md:w-1/2 p-6 md:p-12 flex flex-col justify-center bg-white overflow-y-auto">
-          <div className="mb-6 md:mb-8 text-center md:text-left">
-            <h3 className="text-lg md:text-xl font-black text-slate-800 mb-1">Partner {isLogin ? 'Login' : 'Sign Up'}</h3>
-            <p className="text-slate-500 text-[10px] md:text-sm font-medium uppercase tracking-widest">{isLogin ? 'Please enter your credentials.' : 'Join our network of manufacturers.'}</p>
-          </div>
+          {showForgotPassword ? (
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="mb-6 md:mb-8 text-center md:text-left">
+                <h3 className="text-lg md:text-xl font-black text-slate-800 mb-1">Reset Password</h3>
+                <p className="text-slate-500 text-[10px] md:text-sm font-medium uppercase tracking-widest">
+                  {forgotSent ? 'Check your email inbox.' : 'Enter your email to receive a reset link.'}
+                </p>
+              </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div className="grid grid-cols-1 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Company / Full Name</label>
-                  <div className="relative group">
-                    <FaUser className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-400 transition-colors group-focus-within:text-[#1E3A8A]" />
-                    <input
-                      type="text"
-                      name="name"
-                      required
-                      placeholder="Manufacturing Ltd."
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="w-full pl-11 pr-4 py-2.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all text-sm text-slate-900"
-                    />
+              {forgotSent ? (
+                <div className="space-y-6">
+                  <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
+                    <p className="text-green-700 text-sm font-bold mb-2">Email Sent! 📧</p>
+                    <p className="text-green-600 text-xs">
+                      If an account exists with that email, you will receive a password reset link shortly.
+                    </p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => { setShowForgotPassword(false); setForgotSent(false); setForgotEmail(''); }}
+                    className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-bold text-xs md:text-sm transition-all"
+                  >
+                    Back to Login
+                  </button>
                 </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
-                  <div className="relative group">
-                    <FaPhone className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-400 transition-colors group-focus-within:text-[#1E3A8A]" />
-                    <input
-                      type="tel"
-                      name="phone"
-                      required
-                      placeholder="+91 XXXXX XXXXX"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full pl-11 pr-4 py-2.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all text-sm text-slate-900"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-              <div className="relative group">
-                <FaEnvelope className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-400 transition-colors group-focus-within:text-[#1E3A8A]" />
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="partner@company.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-2.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all text-sm text-slate-900"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex justify-between items-center px-1">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
-                {isLogin && <a href="#" className="text-[10px] font-black text-[#1E3A8A] hover:underline uppercase tracking-widest">Forgot?</a>}
-              </div>
-              <div className="relative group">
-                <FaLock className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-400 transition-colors group-focus-within:text-[#1E3A8A]" />
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-2.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all text-sm text-slate-900"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#1E3A8A] hover:bg-[#1E40AF] text-white py-3.5 md:py-4 rounded-xl md:rounded-2xl font-bold shadow-lg shadow-blue-900/10 flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2 text-xs md:text-sm"
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
-                <>
-                  {isLogin ? 'Access Partner Portal' : 'Create Partner Account'}
-                  <FaArrowRight className="text-[10px] md:text-xs" />
-                </>
-              )}
-            </button>
-          </form>
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                    <div className="relative group">
+                      <FaEnvelope className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-400 transition-colors group-focus-within:text-[#1E3A8A]" />
+                      <input
+                        type="email"
+                        required
+                        placeholder="partner@company.com"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        className="w-full pl-11 pr-4 py-2.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all text-sm text-slate-900"
+                      />
+                    </div>
+                  </div>
 
-          <div className="mt-6 pt-6 border-t border-slate-100 text-center">
-            <p className="text-slate-500 text-[10px] md:text-xs font-medium">
-              {isLogin ? "New to the platform?" : "Already have a partner account?"}{' '}
-              <button 
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-[#1E3A8A] font-bold hover:underline ml-1"
-              >
-                {isLogin ? 'Sign Up' : 'Login'}
-              </button>
-            </p>
-          </div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-[#1E3A8A] hover:bg-[#1E40AF] text-white py-3.5 md:py-4 rounded-xl md:rounded-2xl font-bold shadow-lg shadow-blue-900/10 flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2 text-xs md:text-sm"
+                  >
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    ) : (
+                      'Send Reset Link'
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(false)}
+                    className="w-full text-center text-[10px] md:text-xs text-slate-500 hover:text-slate-700 font-medium transition-colors mt-2"
+                  >
+                    Back to Login
+                  </button>
+                </form>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="mb-6 md:mb-8 text-center md:text-left">
+                <h3 className="text-lg md:text-xl font-black text-slate-800 mb-1">Partner {isLogin ? 'Login' : 'Sign Up'}</h3>
+                <p className="text-slate-500 text-[10px] md:text-sm font-medium uppercase tracking-widest">{isLogin ? 'Please enter your credentials.' : 'Join our network of manufacturers.'}</p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {!isLogin && (
+                  <div className="grid grid-cols-1 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Company / Full Name</label>
+                      <div className="relative group">
+                        <FaUser className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-400 transition-colors group-focus-within:text-[#1E3A8A]" />
+                        <input
+                          type="text"
+                          name="name"
+                          required
+                          placeholder="Manufacturing Ltd."
+                          value={formData.name}
+                          onChange={handleChange}
+                          className="w-full pl-11 pr-4 py-2.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all text-sm text-slate-900"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
+                      <div className="relative group">
+                        <FaPhone className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-400 transition-colors group-focus-within:text-[#1E3A8A]" />
+                        <input
+                          type="tel"
+                          name="phone"
+                          required
+                          placeholder="+91 XXXXX XXXXX"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          className="w-full pl-11 pr-4 py-2.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all text-sm text-slate-900"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                  <div className="relative group">
+                    <FaEnvelope className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-400 transition-colors group-focus-within:text-[#1E3A8A]" />
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      placeholder="partner@company.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full pl-11 pr-4 py-2.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all text-sm text-slate-900"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center px-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                    {isLogin && <button type="button" onClick={() => setShowForgotPassword(true)} className="text-[10px] font-black text-[#1E3A8A] hover:underline uppercase tracking-widest">Forgot?</button>}
+                  </div>
+                  <div className="relative group">
+                    <FaLock className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-400 transition-colors group-focus-within:text-[#1E3A8A]" />
+                    <input
+                      type="password"
+                      name="password"
+                      required
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full pl-11 pr-4 py-2.5 md:py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all text-sm text-slate-900"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#1E3A8A] hover:bg-[#1E40AF] text-white py-3.5 md:py-4 rounded-xl md:rounded-2xl font-bold shadow-lg shadow-blue-900/10 flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-2 text-xs md:text-sm"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      {isLogin ? 'Access Partner Portal' : 'Create Partner Account'}
+                      <FaArrowRight className="text-[10px] md:text-xs" />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+                <p className="text-slate-500 text-[10px] md:text-xs font-medium">
+                  {isLogin ? "New to the platform?" : "Already have a partner account?"}{' '}
+                  <button 
+                    onClick={() => setIsLogin(!isLogin)}
+                    className="text-[#1E3A8A] font-bold hover:underline ml-1"
+                  >
+                    {isLogin ? 'Sign Up' : 'Login'}
+                  </button>
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

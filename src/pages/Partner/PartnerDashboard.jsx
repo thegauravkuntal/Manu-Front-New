@@ -4,7 +4,6 @@ import {
   FaChartLine, 
   FaUsers, 
   FaWallet, 
-  FaArrowUp, 
   FaBell, 
   FaEllipsisV,
   FaCheckCircle,
@@ -14,17 +13,11 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../api/config';
 
-const StatCard = ({ title, value, icon: Icon, trend, color }) => (
+const StatCard = ({ title, value, icon: Icon, color }) => (
   <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between hover:shadow-md transition-shadow">
     <div>
       <p className="text-slate-500 text-sm font-medium mb-1">{title}</p>
       <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
-      {trend && (
-        <p className={`text-xs mt-2 flex items-center ${trend.startsWith('+') ? 'text-blue-600' : 'text-red-500'}`}>
-          <FaArrowUp className={`mr-1 ${trend.startsWith('+') ? '' : 'rotate-180'}`} />
-          {trend} from last month
-        </p>
-      )}
     </div>
     <div className={`w-12 h-12 ${color} rounded-2xl flex items-center justify-center text-white text-xl shadow-lg shadow-current/10`}>
       <Icon />
@@ -95,10 +88,10 @@ const PartnerDashboard = () => {
   }, []);
 
   const statCards = [
-    { title: 'Total Leads', value: stats.totalLeads, icon: FaUsers, trend: '+12.5%', color: 'bg-blue-500' },
-    { title: 'Active Orders', value: stats.activeOrders, icon: FaBoxOpen, trend: '+5.2%', color: 'bg-blue-600' },
-    { title: 'Total Revenue', value: stats.totalRevenue, icon: FaWallet, trend: stats.revenueTrend || '+8.1%', color: 'bg-orange-500' },
-    { title: 'Success Rate', value: `${stats.successRate}%`, icon: FaChartLine, trend: '+2.4%', color: 'bg-purple-500' },
+    { title: 'Total Leads', value: stats.totalLeads, icon: FaUsers, color: 'bg-blue-500' },
+    { title: 'Active Orders', value: stats.activeOrders, icon: FaBoxOpen, color: 'bg-blue-600' },
+    { title: 'Total Revenue', value: stats.totalRevenue, icon: FaWallet, color: 'bg-orange-500' },
+    { title: 'Success Rate', value: `${stats.successRate}%`, icon: FaChartLine, color: 'bg-purple-500' },
   ];
 
   if (loading) {
@@ -113,23 +106,23 @@ const PartnerDashboard = () => {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
       {/* Header Area */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">Partner Dashboard</h1>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Partner Dashboard</h1>
           <p className="text-slate-500 text-sm">Welcome back! Here's what's happening with your manufacturing leads.</p>
         </div>
         <div className="flex items-center gap-3 relative">
           <button 
             onClick={() => setShowNotifications(!showNotifications)}
-            className="relative w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors"
+            className="relative w-11 h-11 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all"
           >
-            <FaBell />
+            <FaBell className="text-sm" />
             <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
           </button>
 
           {/* Notifications Dropdown */}
           {showNotifications && (
-            <div className="absolute top-12 right-0 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 p-4 animate-in fade-in slide-in-from-top-2">
+            <div className="absolute top-14 right-0 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 p-4 animate-in fade-in slide-in-from-top-2">
               <div className="flex items-center justify-between mb-4 border-b pb-2">
                 <h3 className="font-bold text-slate-800">Notifications</h3>
                 <button onClick={() => setShowNotifications(false)} className="text-slate-400 hover:text-slate-600"><FaTimesCircle /></button>
@@ -150,7 +143,7 @@ const PartnerDashboard = () => {
 
           <button 
             onClick={downloadReport}
-            className="bg-[#1E3A8A] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-900/10 hover:bg-[#1E40AF] transition-all active:scale-95"
+            className="bg-[#1E3A8A] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-blue-900/10 hover:bg-[#1E40AF] hover:shadow-xl hover:shadow-blue-900/20 transition-all active:scale-95"
           >
             Download Report
           </button>

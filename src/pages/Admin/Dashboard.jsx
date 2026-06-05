@@ -43,6 +43,7 @@ import ExpirationsTab from "./components/ExpirationsTab";
 import ProfileTab from "./components/ProfileTab";
 import TableTab from "./components/TableTab";
 import PartnersTab from "./components/PartnersTab";
+import Toast from "../../components/Toast";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -104,6 +105,7 @@ const Dashboard = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
   const [globalSearchQuery, setGlobalSearchQuery] = useState("");
+  const [toast, setToast] = useState(null);
   const [notifications, setNotifications] = useState([
     { id: 1, title: "New Lead Received", message: "Rahul Verma submitted a query for EV Component Prototyping", time: "5 mins ago", read: false, type: "Leads" },
     { id: 2, title: "New Order Placed", message: "Order #ORD-7729 placed by Acme Corp", time: "1 hour ago", read: false, type: "Orders" },
@@ -425,6 +427,7 @@ const Dashboard = () => {
         setIsEditModalOpen(false);
         setEditingItem(null);
         fetchData();
+        setToast({ message: "Updated successfully!", type: "success" });
       } else {
         alert(data.msg || "Error updating item");
       }
@@ -532,6 +535,7 @@ const Dashboard = () => {
         });
         setImageFile(null);
         fetchData();
+        setToast({ message: `${activeMenu.slice(0, -1)} added successfully!`, type: "success" });
       } else {
         alert(data.msg || "Error adding item");
       }
@@ -775,6 +779,11 @@ const Dashboard = () => {
         setActiveMenu={setActiveMenu}
         handleEditClick={handleEditClick}
       />
+
+      {/* TOAST */}
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+      )}
 
     </div>
   );

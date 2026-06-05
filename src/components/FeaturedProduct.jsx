@@ -211,11 +211,11 @@ const FeaturedProducts = () => {
                 const url = getProductUrl(item);
                 navigate(url, { state: item });
               }}
-              className="group bg-white rounded-2xl md:rounded-[22px] border border-gray-200 shadow-md hover:shadow-xl transition overflow-hidden cursor-pointer"
+              className="group bg-white rounded-2xl md:rounded-[22px] border border-gray-200 shadow-md hover:shadow-xl transition overflow-hidden cursor-pointer flex flex-col"
             >
 
               {/* 🔥 IMAGE AREA */}
-              <div className="relative h-[140px] md:h-[165px] overflow-hidden">
+              <div className="relative h-[140px] md:h-[165px] overflow-hidden flex-shrink-0">
 
                 {/* 🔥 IMAGE */}
                 <img
@@ -246,7 +246,7 @@ const FeaturedProducts = () => {
 
 
               {/* 🔥 CONTENT */}
-              <div className="px-4 md:px-5 pt-3 md:pt-4 pb-4 md:pb-5">
+              <div className="px-4 md:px-5 pt-3 md:pt-4 pb-4 md:pb-5 flex flex-col flex-1">
 
                 {/* 🔥 TITLE */}
                 <h3 className="text-[16px] md:text-[18px] font-extrabold text-[#1E3A8A] uppercase leading-tight md:leading-6">
@@ -258,7 +258,7 @@ const FeaturedProducts = () => {
 
 
                 {/* 🔥 DESC */}
-                <p className="text-gray-700 mt-2 md:mt-3 text-[13px] md:text-[15px] leading-relaxed md:leading-7 line-clamp-4 min-h-[70px] md:min-h-[95px]">
+                <p className="text-gray-700 mt-2 md:mt-3 text-[13px] md:text-[15px] leading-relaxed md:leading-7 line-clamp-4">
                   {item.shortDescription || item.desc || "Industrial machinery from verified suppliers."}
                 </p>
 
@@ -273,7 +273,7 @@ const FeaturedProducts = () => {
                     setIsModalOpen(true);
                     setSelectedProduct(item);
                   }}
-                  className="mt-5 md:mt-6 w-full py-2.5 md:py-3 bg-[#1E3A8A] text-white rounded-lg md:rounded-xl font-bold text-xs md:text-sm shadow-md hover:bg-slate-900 transition-all active:scale-95"
+                  className="mt-auto w-full py-2.5 md:py-3 bg-[#1E3A8A] text-white rounded-lg md:rounded-xl font-bold text-xs md:text-sm shadow-md hover:bg-slate-900 transition-all active:scale-95"
                 >
                   Contact Supplier
                 </button>

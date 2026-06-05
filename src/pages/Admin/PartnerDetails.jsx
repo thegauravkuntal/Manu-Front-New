@@ -337,48 +337,6 @@ const PartnerDetails = () => {
                 </div>
             </div>
 
-            {/* Performance Stats */}
-            <div className="bg-gradient-to-br from-orange-500 to-blue-800 rounded-[40px] p-8 text-white space-y-8 shadow-2xl shadow-blue-900/20">
-                <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-black uppercase tracking-[3px] text-orange-200/60">Performance</h3>
-                    <ShieldCheck size={18} className="text-orange-300" />
-                </div>
-                
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between group cursor-default">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                                <Briefcase size={18} />
-                            </div>
-                            <span className="text-xs font-bold">Total Leads</span>
-                        </div>
-                        <span className="text-xl font-black">124</span>
-                    </div>
-                    <div className="flex items-center justify-between group cursor-default">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                                <Package size={18} />
-                            </div>
-                            <span className="text-xs font-bold">Live Products</span>
-                        </div>
-                        <span className="text-xl font-black">12</span>
-                    </div>
-                    <div className="flex items-center justify-between group cursor-default">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                                <IndianRupee size={18} />
-                            </div>
-                            <span className="text-xs font-bold">Total Volume</span>
-                        </div>
-                        <span className="text-xl font-black">₹4.2L</span>
-                    </div>
-                </div>
-
-                <button className="w-full py-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-[24px] text-xs font-black uppercase tracking-widest transition-all">
-                    Generate Report
-                </button>
-            </div>
-
           </div>
 
         </div>

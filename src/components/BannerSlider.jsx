@@ -8,32 +8,27 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 
-import { API_BASE_URL } from "../api/config";
-
 const DEFAULT_SLIDES = [
   {
     _id: "slide-1",
-    title: "Source Industrial",
-    highlight: "Machinery",
-    desc: "Connect with verified manufacturers across India.",
-    image:
-      "https://res.cloudinary.com/djsxaigna/image/upload/v1778687629/manufacturing_b2b/tiwud4hv6wtvt4cbgozz.jpg",
+    title: "printing machine",
+    highlight: "",
+    desc: "Versatile printing machine for all industrial printing needs.",
+    image: "/products/packaging-machine.jpg",
   },
   {
     _id: "slide-2",
-    title: "Packaging",
-    highlight: "Solutions",
-    desc: "Find cup, bag, and packaging machines from trusted sellers.",
-    image:
-      "https://res.cloudinary.com/djsxaigna/image/upload/v1779526091/manu_uploads/oju73iddjm2mbnw3oxte.jpg",
+    title: "welding",
+    highlight: "",
+    desc: "Industrial welding solutions for precision metal fabrication.",
+    image: "/products/steel.jpg",
   },
   {
     _id: "slide-3",
-    title: "Grow Your",
-    highlight: "Business",
-    desc: "List products and receive qualified B2B leads on Ultraclap.",
-    image:
-      "https://res.cloudinary.com/djsxaigna/image/upload/v1778687629/manufacturing_b2b/tiwud4hv6wtvt4cbgozz.jpg",
+    title: "automatic cup machine",
+    highlight: "",
+    desc: "High-efficiency cup production with precision forming technology.",
+    image: "/products/papercup-machine.jpg",
   },
 ];
 
@@ -56,34 +51,10 @@ const BannerSlider = () => {
 
 
 
-  /* 🔥 FETCH SLIDERS */
+  /* 🔥 USE LOCAL SLIDES */
   useEffect(() => {
-
-    const fetchSlides =
-      async () => {
-
-        try {
-
-          const res =
-            await fetch(`${API_BASE_URL}/sliders`);
-
-          const data = await res.json();
-          const list = Array.isArray(data)
-            ? data
-            : data.sliders || [];
-
-          setSlides(list.length > 0 ? list : DEFAULT_SLIDES);
-        } catch (err) {
-          console.error("Slider fetch error:", err);
-          setSlides(DEFAULT_SLIDES);
-        } finally {
-
-          setLoading(false);
-        }
-      };
-
-    fetchSlides();
-
+    setSlides(DEFAULT_SLIDES);
+    setLoading(false);
   }, []);
 
   const displaySlides =

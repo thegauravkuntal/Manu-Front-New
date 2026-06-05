@@ -24,7 +24,9 @@ const KYCVerification = () => {
     gstDoc: null,
     businessRegDoc: null,
     aadharDoc: null,
-    panDoc: null
+    panDoc: null,
+    businessMobile: '',
+    businessMobileDoc: null
   });
   const [profile, setProfile] = useState(null);
 
@@ -77,6 +79,7 @@ const KYCVerification = () => {
       data.append('businessRegistrationNumber', formData.businessRegistrationNumber);
       data.append('aadharNumber', formData.aadharNumber);
       data.append('panNumber', formData.panNumber);
+      data.append('businessMobile', formData.businessMobile);
       
       if (formData.gstDoc) {
         data.append('gstDoc', formData.gstDoc);
@@ -100,6 +103,12 @@ const KYCVerification = () => {
         data.append('panDoc', formData.panDoc);
       } else {
         data.append('panDoc', profile?.panDoc || '');
+      }
+
+      if (formData.businessMobileDoc) {
+        data.append('businessMobileDoc', formData.businessMobileDoc);
+      } else {
+        data.append('businessMobileDoc', profile?.businessMobileDoc || '');
       }
 
       const res = await fetch(`${API_BASE_URL}/partner/kyc`, {
@@ -396,6 +405,47 @@ const KYCVerification = () => {
                     </div>
                     <div className="text-center">
                       <p className="text-xs font-bold text-slate-700">{formData.panDoc ? formData.panDoc.name : profile?.panDoc ? 'PAN Uploaded' : 'Upload PAN PDF'}</p>
+                      <p className="text-[10px] text-slate-400 mt-1">Click to browse files</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Business Mobile */}
+              <div className="space-y-2">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-[2px] ml-1">Business Mobile</label>
+                <div className="relative group">
+                  <FaIdCard className="absolute top-1/2 -translate-y-1/2 left-4 text-slate-300 transition-colors group-focus-within:text-[#1E3A8A]" />
+                  <input 
+                    type="tel" 
+                    placeholder="+91 98765 43210"
+                    className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all font-bold text-slate-800"
+                    value={formData.businessMobile}
+                    onChange={(e) => setFormData({...formData, businessMobile: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Business Mobile Doc */}
+              <div className="space-y-2">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-[2px] ml-1">Business Mobile Bill</label>
+                <div className="relative">
+                  <input 
+                    type="file" 
+                    id="businessMobileDoc"
+                    name="businessMobileDoc"
+                    onChange={handleFileChange}
+                    className="hidden" 
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    required={!profile?.businessMobileDoc}
+                  />
+                  <label htmlFor="businessMobileDoc" className="flex flex-col items-center justify-center gap-3 w-full p-8 border-2 border-dashed border-slate-200 rounded-[28px] hover:border-[#1E3A8A] hover:bg-blue-50/30 transition-all cursor-pointer group">
+                    <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center group-hover:bg-[#1E3A8A] group-hover:text-white transition-all">
+                      <FaFileUpload />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs font-bold text-slate-700">{formData.businessMobileDoc ? formData.businessMobileDoc.name : profile?.businessMobileDoc ? 'Mobile Bill Uploaded' : 'Upload Mobile Bill'}</p>
                       <p className="text-[10px] text-slate-400 mt-1">Click to browse files</p>
                     </div>
                   </label>

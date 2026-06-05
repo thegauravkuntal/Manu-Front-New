@@ -303,10 +303,10 @@ const AddModal = ({
           )}
 
           {/* Image Upload */}
-          {["Products", "Machinery", "Main Categories"].includes(activeMenu) && (
+          {["Products", "Sub Categories", "Main Categories"].includes(activeMenu) && (
             <div className="space-y-2 pb-4">
               <label className="text-xs text-gray-400 font-bold uppercase tracking-wider">
-                {activeMenu === "Machinery" ? "Machinery Icon" : activeMenu === "Products" ? "Product Images (Multiple)" : "Image"}
+                {activeMenu === "Sub Categories" ? "Subcategory Icon" : activeMenu === "Products" ? "Product Images (Multiple)" : "Image"}
               </label>
               <div className="space-y-3">
                 <input 
