@@ -1,37 +1,6 @@
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../api/config";
 
-const DEFAULT_TESTIMONIALS = [
-  {
-    _id: "default-1",
-    name: "Rajesh Kumar",
-    text: "Ultraclap helped us source a paper cup machine within days. Direct supplier contact saved us weeks of back-and-forth with brokers.",
-    location: "Bhiwadi, Rajasthan",
-    color: "green",
-  },
-  {
-    _id: "default-2",
-    name: "Priya Sharma",
-    text: "We listed our packaging machinery and started receiving qualified leads immediately. The partner dashboard makes follow-ups very easy.",
-    location: "Ahmedabad, Gujarat",
-    color: "purple",
-  },
-  {
-    _id: "default-3",
-    name: "Amit Patel",
-    text: "Found a verified steel fabrication supplier for our plant expansion. Pricing was transparent and the seller responded within hours.",
-    location: "Pune, Maharashtra",
-    color: "green",
-  },
-  {
-    _id: "default-4",
-    name: "Suresh Reddy",
-    text: "Excellent B2B marketplace for industrial equipment. From inquiry to delivery coordination, the entire process felt professional.",
-    location: "Hyderabad, Telangana",
-    color: "purple",
-  },
-];
-
 const Testimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,14 +11,16 @@ const Testimonials = () => {
         const res = await fetch(`${API_BASE_URL}/testimonials`);
         const data = await res.json();
 
-        if (res.ok && data.success && data.testimonials?.length > 0) {
+        if (res.ok && data.success && data.testimonials) {
+          // Show whatever backend returns (could be default or real data)
           setTestimonials(data.testimonials.slice(0, 4));
         } else {
-          setTestimonials(DEFAULT_TESTIMONIALS);
+          // Fallback only on network error, not on empty database
+          setTestimonials([]);
         }
       } catch (err) {
         console.error("Testimonials fetch error:", err);
-        setTestimonials(DEFAULT_TESTIMONIALS);
+        setTestimonials([]);
       } finally {
         setLoading(false);
       }
@@ -58,15 +29,16 @@ const Testimonials = () => {
     fetchTestimonials();
   }, []);
 
-  const displayList =
-    testimonials.length > 0 ? testimonials.slice(0, 4) : DEFAULT_TESTIMONIALS;
-
   if (loading) {
     return (
       <section className="py-14 bg-[#f5f7f6]">
         <p className="text-center text-gray-500 animate-pulse">Loading testimonials...</p>
       </section>
     );
+  }
+
+  if (testimonials.length === 0) {
+    return null; // Don't show section if no testimonials
   }
 
   return (
@@ -88,7 +60,7 @@ const Testimonials = () => {
 
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          {displayList.map((item) => (
+          {testimonials.map((item) => (
             <div
               key={item._id}
               className="relative bg-white rounded-2xl md:rounded-[26px] p-5 md:p-6 shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition duration-300 min-h-[260px] md:min-h-[300px]"

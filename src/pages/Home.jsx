@@ -7,12 +7,13 @@ import Manufacturing from "../components/Manufacturing";
 import SubCategories from "../components/SubCategories";
 import AppBanner from "../components/Banner";
 import LocationSection from "../components/LocationSection";
-import Faqs from "../components/Faqs"; // ✅ सही नाम
+import Faqs from "../components/Faqs";
 import FeaturedProducts from "../components/FeaturedProduct";
 import Industry from "../components/Industry";
 import Testimonials from "../components/Testimoniols";
 import TopMarqueeBar from "../components/TopMarqueeBar";
 import PartnerLogin from "../components/PartnerLogin";
+import SEOHead from "../components/SEOHead";
 import { API_BASE_URL } from "../api/config";
 
 const Home = () => {
@@ -36,35 +37,26 @@ const Home = () => {
   }, []);
 
   return (
-    <div>
-      <HeroSection />
+    <>
+      {/* 🔥 SEO HEAD - SIRF HOME PAGE KE LIYE */}
+      <SEOHead pageSlug="home" />
 
-      {showManufacturing && <Manufacturing />}
-
-      {/* 🔥 NEW SLIDER BANNER */}
-      <BannerSlider />
-
-      <SubCategories />
-
-      <AppBanner />
-
-      <FeaturedProducts />
-
-      <Stats />
-
-      <TopMarqueeBar />
-
-      <PartnerLogin />
-
-      <Faqs />
-
-      <LocationSection />
-
-      <Industry />
-
-      <Testimonials/>
-
-    </div>
+      <div>
+        <HeroSection />
+        {showManufacturing && <Manufacturing />}
+        <SubCategories />
+        <BannerSlider />
+        <AppBanner />
+        <FeaturedProducts />
+        <Stats />
+        <TopMarqueeBar />
+        <PartnerLogin />
+        <Faqs />
+        <LocationSection />
+        <Industry />
+        <Testimonials />
+      </div>
+    </>
   );
 };
 

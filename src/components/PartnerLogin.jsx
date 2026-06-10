@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { FaEnvelope, FaLock, FaArrowRight, FaHandshake } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaArrowRight, FaHandshake, FaThLarge, FaSignOutAlt } from 'react-icons/fa';
 import { API_BASE_URL } from "../api/config";
+import { useNavigate } from "react-router-dom";
 
 const PartnerLogin = () => {
+  const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -49,6 +54,68 @@ const PartnerLogin = () => {
       setLoading(false);
     }
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    window.location.reload();
+  };
+
+  // If user is already logged in with partner/admin role, show profile card
+  if (user && (user.role === "partner" || user.role === "admin")) {
+    return (
+      <section id="partner-login" className="relative py-20 overflow-hidden bg-slate-50">
+        <div className="absolute top-0 left-0 w-64 h-64 bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-1/3 translate-y-1/3"></div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+              <div className="bg-gradient-to-r from-[#1E3A8A] to-[#0F2A43] p-10 md:p-14 text-center">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 rounded-full mb-6 backdrop-blur-sm">
+                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+                    <span className="text-4xl font-bold text-white">
+                      {user.name?.[0]?.toUpperCase() || "P"}
+                    </span>
+                  </div>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                  Welcome back, {user.name || "Partner"}!
+                </h2>
+                <p className="text-blue-200 text-sm md:text-base">
+                  You are logged in as a <span className="font-bold text-orange-300 capitalize">{user.role}</span>
+                </p>
+              </div>
+
+              <div className="p-8 md:p-12 space-y-5">
+                <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
+                  <p className="text-slate-600 text-sm mb-1">Email</p>
+                  <p className="text-slate-800 font-bold">{user.email}</p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    onClick={() => navigate(user.role === "admin" ? "/admin/dashboard" : "/partner/dashboard")}
+                    className="flex-1 bg-[#1E3A8A] hover:bg-[#1E40AF] text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-900/10 flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
+                  >
+                    <FaThLarge />
+                    Go to Dashboard
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
+                  >
+                    <FaSignOutAlt />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="partner-login" className="relative py-20 overflow-hidden bg-slate-50">
@@ -108,7 +175,7 @@ const PartnerLogin = () => {
                     placeholder="partner@company.com"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all text-slate-900"
                   />
                 </div>
               </div>
@@ -128,7 +195,7 @@ const PartnerLogin = () => {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-[#1E3A8A] transition-all text-slate-900"
                   />
                 </div>
               </div>

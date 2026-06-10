@@ -30,7 +30,7 @@ const Sidebar = ({
       </div>
 
       {/* MENU */}
-      <div className="flex-1 px-2 pt-3 overflow-hidden">
+      <div className="flex-1 px-2 pt-3 overflow-y-auto scrollbar-thin">
         <div className="space-y-1">
           {menuItems.map((item, index) => (
             <button

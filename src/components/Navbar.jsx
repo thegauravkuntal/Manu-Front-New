@@ -40,157 +40,134 @@ const Navbar = ({
 
   const [authModal, setAuthModal] = useState({ show: false, mode: "login" });
 
-  const [navbar, setNavbar] =
-    useState(null);
+  const [navbar, setNavbar] = useState(null);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [productCategories, setProductCategories] = useState([]);
 
-  const [category, setCategory] =
-    useState("All Categories");
+  // ✅ By default "Manufacturing" select
+  const [category, setCategory] = useState("Manufacturing");
 
-  const [openDropdown, setOpenDropdown] =
-    useState(false);
+  // 👇 ALAG STATES for Desktop and Mobile
+  const [desktopDropdown, setDesktopDropdown] = useState(false);
+  const [mobileDropdown, setMobileDropdown] = useState(false);
 
-  const [search, setSearch] =
-    useState("");
+  const [search, setSearch] = useState("");
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
-  const dropdownRef =
-    useRef(null);
-
-
+  // 👇 ALAG REFS for Desktop and Mobile
+  const desktopDropdownRef = useRef(null);
+  const mobileDropdownRef = useRef(null);
 
   /* 🔥 GET USER */
   const user = JSON.parse(
     localStorage.getItem("user")
   );
 
-
-
-
   /* 🔥 FETCH NAVBAR & CATEGORIES */
   useEffect(() => {
 
-    const fetchData =
-      async () => {
+    const fetchData = async () => {
 
-        try {
+      try {
 
-          const [navbarRes, productsRes, manufacturingRes] = await Promise.all([
-            fetch(`${API_BASE_URL}/navbar`),
-            fetch(`${API_BASE_URL}/products`),
-            fetch(`${API_BASE_URL}/manufacturing`)
-          ]);
+        const [navbarRes, productsRes, manufacturingRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/navbar`),
+          fetch(`${API_BASE_URL}/products`),
+          fetch(`${API_BASE_URL}/manufacturing`)
+        ]);
 
-          const navbarData = await navbarRes.json();
-          const productsData = await productsRes.json();
-          const manufacturingData = await manufacturingRes.json();
+        const navbarData = await navbarRes.json();
+        const productsData = await productsRes.json();
+        const manufacturingData = await manufacturingRes.json();
 
-          if (navbarRes.ok && navbarData.navbar) {
-            setNavbar(navbarData.navbar);
-          } else if (navbarRes.ok && navbarData.placeholder) {
-            setNavbar(navbarData);
-          } else {
-            setNavbar(DEFAULT_NAVBAR);
-          }
-
-          const seen = new Set();
-          const cats = [];
-
-          if (productsData.success) {
-            productsData.products.forEach(p => {
-              const name = p.category || 'Uncategorized';
-              if (!seen.has(name)) {
-                seen.add(name);
-                cats.push(name);
-              }
-            });
-          }
-
-          if (manufacturingData.success) {
-            manufacturingData.manufacturing.forEach(m => {
-              const name = m.title || 'Uncategorized';
-              if (!seen.has(name)) {
-                seen.add(name);
-                cats.push(name);
-              }
-            });
-          }
-
-          setProductCategories(cats);
-
-        } catch (err) {
-          console.error("Navbar fetch error:", err);
+        if (navbarRes.ok && navbarData.navbar) {
+          setNavbar(navbarData.navbar);
+        } else if (navbarRes.ok && navbarData.placeholder) {
+          setNavbar(navbarData);
+        } else {
           setNavbar(DEFAULT_NAVBAR);
-        } finally {
-
-          setLoading(false);
         }
-      };
+
+        const seen = new Set();
+        const cats = [];
+
+        if (productsData.success) {
+          productsData.products.forEach(p => {
+            const name = p.category || 'Uncategorized';
+            if (!seen.has(name)) {
+              seen.add(name);
+              cats.push(name);
+            }
+          });
+        }
+
+        if (manufacturingData.success) {
+          manufacturingData.manufacturing.forEach(m => {
+            const name = m.title || 'Uncategorized';
+            if (!seen.has(name)) {
+              seen.add(name);
+              cats.push(name);
+            }
+          });
+        }
+
+        setProductCategories(cats);
+
+      } catch (err) {
+        console.error("Navbar fetch error:", err);
+        setNavbar(DEFAULT_NAVBAR);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchData();
 
   }, []);
 
-
-
-
-  /* 🔥 OUTSIDE CLICK */
+  /* 🔥 OUTSIDE CLICK for Desktop */
   useEffect(() => {
 
-    const handleClickOutside =
-      (e) => {
+    const handleClickOutside = (e) => {
+      if (desktopDropdownRef.current && !desktopDropdownRef.current.contains(e.target)) {
+        setDesktopDropdown(false);
+      }
+    };
 
-        if (
-          dropdownRef.current &&
-          !dropdownRef.current.contains(
-            e.target
-          )
-        ) {
-
-          setOpenDropdown(false);
-        }
-      };
-
-    document.addEventListener(
-      "mousedown",
-      handleClickOutside
-    );
-
-    return () =>
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
 
   }, []);
 
+  /* 🔥 OUTSIDE CLICK for Mobile */
+  useEffect(() => {
 
+    const handleClickOutside = (e) => {
+      if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(e.target)) {
+        setMobileDropdown(false);
+      }
+    };
 
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+  }, []);
 
   /* 🔄 LOADING */
   if (loading) {
     return null;
   }
 
-
-
-
   const nav = navbar || DEFAULT_NAVBAR;
-
-
-
 
   /* 🔥 HANDLE SEARCH */
   const handleSearch = () => {
-    let url = category !== "All Categories" ? getCategoryUrl(category) : "/all-products";
+    let url = category !== "Manufacturing" ? getCategoryUrl(category) : "/all-products";
     if (search.trim()) {
       url += (url.includes("?") ? "&" : "?") + `q=${encodeURIComponent(search)}`;
     }
@@ -213,21 +190,21 @@ const Navbar = ({
 
           {/* 🔥 SEARCH (Desktop) */}
           <div className="hidden lg:flex flex-1 items-stretch bg-white border border-gray-300 rounded-full shadow-sm h-[46px]">
-            <div ref={dropdownRef} className="relative h-full z-[2000]">
+            <div ref={desktopDropdownRef} className="relative h-full z-[2000]">
               <div
-                onClick={() => setOpenDropdown((prev) => !prev)}
+                onClick={() => setDesktopDropdown((prev) => !prev)}
                 className="flex items-center gap-2 px-4 bg-gray-100 border-r border-gray-300 cursor-pointer h-full"
               >
                 <span className="text-sm text-gray-700 whitespace-nowrap">{category}</span>
                 <FaChevronDown className="text-xs text-gray-500" />
               </div>
 
-              {openDropdown && (
+              {desktopDropdown && (
                 <div className="absolute top-[50px] left-0 bg-white border border-gray-200 rounded-xl shadow-lg w-52 z-[3000]">
                   <div
                     onClick={() => {
                       setCategory("All Categories");
-                      setOpenDropdown(false);
+                      setDesktopDropdown(false);
                     }}
                     className="px-4 py-2 text-sm text-gray-700 hover:bg-[#1E3A8A] hover:text-white cursor-pointer transition"
                   >
@@ -238,7 +215,7 @@ const Navbar = ({
                       key={name}
                       onClick={() => {
                         setCategory(name);
-                        setOpenDropdown(false);
+                        setDesktopDropdown(false);
                       }}
                       className="px-4 py-2 text-sm text-gray-700 hover:bg-[#1E3A8A] hover:text-white cursor-pointer transition"
                     >
@@ -378,26 +355,62 @@ const Navbar = ({
           </div>
         </div>
 
-        {/* 🔥 MOBILE SEARCH BAR (Sticky below Navbar) */}
-        <div className="lg:hidden px-4 pb-2">
-          <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm h-[36px] overflow-hidden">
+        {/* 🔥 MOBILE SEARCH BAR (with LEFT side dropdown) - FIXED */}
+        <div className="lg:hidden px-4 pb-2 pt-1">
+          <div className="flex items-stretch bg-white border border-gray-300 rounded-full shadow-sm h-[36px]">
+            {/* Category Dropdown - Left Side for Mobile */}
+            <div ref={mobileDropdownRef} className="relative h-full">
+              <div
+                onClick={() => setMobileDropdown((prev) => !prev)}
+                className="flex items-center gap-1 px-3 bg-gray-100 border-r border-gray-300 cursor-pointer h-full rounded-l-full"
+              >
+                <span className="text-[11px] text-gray-700 whitespace-nowrap font-medium">{category}</span>
+                <FaChevronDown className="text-[8px] text-gray-500" />
+              </div>
+
+              {mobileDropdown && (
+                <div className="absolute top-[36px] left-0 bg-white border border-gray-200 rounded-xl shadow-lg w-44 z-[5000] max-h-[200px] overflow-y-auto">
+                  <div
+                    onClick={() => {
+                      setCategory("All Categories");
+                      setMobileDropdown(false);
+                    }}
+                    className="px-3 py-2 text-[11px] text-gray-700 hover:bg-[#1E3A8A] hover:text-white cursor-pointer transition"
+                  >
+                    All Categories
+                  </div>
+                  {productCategories.map((name) => (
+                    <div
+                      key={name}
+                      onClick={() => {
+                        setCategory(name);
+                        setMobileDropdown(false);
+                      }}
+                      className="px-3 py-2 text-[11px] text-gray-700 hover:bg-[#1E3A8A] hover:text-white cursor-pointer transition"
+                    >
+                      {name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && search.trim() !== "") {
-                  navigate(`/search?q=${search}`);
+                if (e.key === "Enter") {
+                  handleSearch();
                 }
               }}
               placeholder={nav.placeholder}
-              className="flex-1 px-4 text-[11px] outline-none text-gray-700 h-full"
+              className="flex-1 px-3 text-[11px] outline-none text-gray-700 h-full"
             />
+
             <button
-              onClick={() => {
-                if (search.trim() !== "") navigate(`/search?q=${search}`);
-              }}
-              className="bg-[#1E3A8A] px-4 h-full text-white"
+              onClick={handleSearch}
+              className="bg-[#1E3A8A] hover:bg-[#1E40AF] w-[40px] h-full flex items-center justify-center text-white rounded-r-full"
             >
               <FaSearch size={12} />
             </button>

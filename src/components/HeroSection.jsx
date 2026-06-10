@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   FaBoxOpen,
   FaShieldAlt,
@@ -11,12 +10,10 @@ import {
 import {
   FaWhatsapp,
   FaInstagram,
-  FaTwitter,
   FaYoutube,
   FaLinkedin,
 } from "react-icons/fa";
 
-import { API_BASE_URL } from "../api/config";
 
 // 🔥 IMAGES (ADD THESE)
 import img1 from "../assets/manufacturing.jpg";
@@ -56,11 +53,6 @@ const Hero = () => {
   const [step, setStep] = useState(0);
   const [pulse, setPulse] = useState(false);
   const [hovered, setHovered] = useState(null);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("All Categories");
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const navigate = useNavigate();
 
   const nextSlide = () => {
     setCurrent((prev) => (prev + 1) % slides.length);
@@ -72,32 +64,6 @@ const Hero = () => {
     );
   };
 
-  // 🔥 FETCH CATEGORIES
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/categories`);
-        const data = await res.json();
-        setCategories(data.categories || data);
-      } catch (err) {
-        console.log("Error fetching categories:", err);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  // 🔥 HANDLE SEARCH
-  const handleSearch = () => {
-    let url = "/search";
-    const params = [];
-    if (searchQuery.trim()) params.push(`q=${encodeURIComponent(searchQuery)}`);
-    if (selectedCategory !== "All Categories") params.push(`category=${encodeURIComponent(selectedCategory)}`);
-    
-    if (params.length > 0) {
-      url += `?${params.join("&")}`;
-    }
-    navigate(url);
-  };
 
   // 🔥 AUTO SLIDE
   useEffect(() => {
@@ -133,13 +99,12 @@ const Hero = () => {
   // 🔥 SOCIAL ICONS
   const socials = [
     { icon: <FaInstagram />, name: "Instagram", color: "text-pink-500" },
-    { icon: <FaTwitter />, name: "Twitter", color: "text-black" },
     { icon: <FaYoutube />, name: "YouTube", color: "text-red-600" },
     { icon: <FaLinkedin />, name: "LinkedIn", color: "text-blue-600" },
   ];
 
   return (
-    <section className="relative h-[80vh] md:h-[90vh] w-full overflow-hidden">
+    <section className="relative h-[55vh] md:h-[90vh] w-full overflow-hidden">
 
       {/* 🔥 SLIDES */}
       {slides.map((slide, i) => (
@@ -171,20 +136,20 @@ const Hero = () => {
       </button>
 
       {/* 🔥 MOBILE NAVIGATION DOTS */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50 flex gap-2 lg:hidden">
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-50 flex gap-2 lg:hidden">
         {slides.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            className={`w-2.5 h-2.5 rounded-full transition-all ${
-              i === current ? "bg-blue-600 w-8" : "bg-white/30"
+            className={`w-2 h-2 rounded-full transition-all ${
+              i === current ? "bg-blue-600 w-6" : "bg-white/40"
             }`}
           />
         ))}
       </div>
 
-      {/* 🔥 FLOATING ACTION BUTTONS - Repositioned to bottom-right for accessibility */}
-      <div className="fixed right-6 bottom-24 sm:bottom-10 z-[1000] flex flex-col gap-4 animate-in slide-in-from-right-10 duration-700">
+      {/* 🔥 FLOATING ACTION BUTTONS */}
+      <div className="fixed right-6 bottom-20 sm:bottom-10 z-[1000] flex flex-col gap-4 animate-in slide-in-from-right-10 duration-700">
 
         <div className="relative group">
           <div className={`absolute inset-0 bg-blue-500 opacity-20 rounded-full ${pulse ? "scale-[1.8]" : "scale-100"} transition-all duration-1000`} />
@@ -202,7 +167,7 @@ const Hero = () => {
             href="https://wa.me/910000000000"
             target="_blank"
             rel="noreferrer"
-            className="relative bg-blue-600 w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-white cursor-pointer shadow-2xl hover:scale-110 transition-all active:scale-90"
+            className="relative bg-green-500 w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-white cursor-pointer shadow-2xl hover:scale-110 transition-all active:scale-90"
           >
             <FaWhatsapp size={22} />
           </a>
@@ -237,17 +202,17 @@ const Hero = () => {
       {/* 🔥 CONTENT */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-center">
 
-        <div className="max-w-3xl text-white text-center space-y-3 md:space-y-6">
+        <div className="max-w-3xl text-white text-center space-y-2 md:space-y-6">
 
           {/* STEP 1 */}
-          <p className={`text-orange-400 text-xs md:text-base font-semibold transition-all duration-700 ${
+          <p className={`text-orange-400 text-[10px] md:text-base font-semibold transition-all duration-700 ${
             step >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}>
             {slides[current].subtitle}
           </p>
 
           {/* STEP 2 */}
-          <h1 className={`text-2xl md:text-5xl lg:text-6xl font-bold transition-all duration-700 leading-tight px-2 ${
+          <h1 className={`text-xl md:text-5xl lg:text-6xl font-bold transition-all duration-700 leading-tight px-2 ${
             step >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}>
             Your Trusted Partner in <br className="hidden md:block" />
@@ -255,56 +220,22 @@ const Hero = () => {
           </h1>
 
           {/* STEP 3 */}
-          <p className={`text-gray-200 text-[10px] md:text-base lg:text-lg transition-all duration-700 max-w-2xl mx-auto px-4 ${
+          <p className={`text-gray-200 text-[9px] md:text-base lg:text-lg transition-all duration-700 max-w-2xl mx-auto px-3 line-clamp-2 md:line-clamp-none ${
             step >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}>
             {slides[current].desc}
           </p>
 
-          {/* 🔥 SEARCH - Responsive stack */}
-          <div className="flex flex-col sm:flex-row bg-white rounded-lg sm:rounded-xl overflow-hidden shadow-2xl max-w-xl mx-auto w-[90%] sm:w-full border border-gray-100 mt-4 md:mt-8">
+          {/* 🔥 BADGES */}
+          <div className="flex flex-wrap gap-2 md:gap-8 justify-center pt-1 md:pt-4 text-[8px] md:text-sm font-medium">
 
-            <select 
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 md:px-4 py-2 md:py-3 bg-gray-50 text-black border-b sm:border-b-0 sm:border-r text-[11px] md:text-sm focus:outline-none"
-            >
-              <option>All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat.name}>{cat.name}</option>
-              ))}
-            </select>
-
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSearch();
-              }}
-              className="flex-1 px-3 md:px-4 py-2 md:py-3 text-black outline-none text-[11px] md:text-sm"
-            />
-
-            <button 
-              onClick={handleSearch}
-              className="bg-[#1E3A8A] hover:bg-[#1E40AF] transition-colors px-4 md:px-8 py-2 md:py-3 text-white font-bold text-xs md:text-sm"
-            >
-              Search
-            </button>
-
-          </div>
-
-          {/* 🔥 BADGES - Hidden or scaled on small screens */}
-          <div className="flex flex-wrap gap-3 md:gap-8 justify-center pt-2 md:pt-4 text-[9px] md:text-sm font-medium">
-
-            <div className="flex items-center gap-1.5 md:gap-2">
-              <FaShieldAlt className="text-blue-600 text-sm md:text-lg" />
+            <div className="flex items-center gap-1 md:gap-2">
+              <FaShieldAlt className="text-blue-600 text-[10px] md:text-lg" />
               <span>Verified Manufacturers</span>
             </div>
 
-            <div className="flex items-center gap-1.5 md:gap-2">
-              <FaBoxOpen className="text-blue-600 text-sm md:text-lg" />
+            <div className="flex items-center gap-1 md:gap-2">
+              <FaBoxOpen className="text-blue-600 text-[10px] md:text-lg" />
               <span>Best Industry Prices</span>
             </div>
 
@@ -316,12 +247,12 @@ const Hero = () => {
           </div>
 
           {/* 🔥 SUPPORTED BY */}
-          <div className="flex items-center justify-center gap-3 mt-4 md:mt-8 scale-[0.7] md:scale-100">
-            <div className="h-[1px] w-12 md:w-20 bg-orange-400"></div>
-            <div className="bg-[#1E3A8A] text-white px-5 py-1.5 rounded-full tracking-[3px] md:tracking-[5px] text-[10px] font-bold whitespace-nowrap">
+          <div className="flex items-center justify-center gap-2 mt-1 md:mt-8 scale-[0.6] md:scale-100">
+            <div className="h-[1px] w-8 md:w-20 bg-orange-400"></div>
+            <div className="bg-[#1E3A8A] text-white px-3 py-0.5 md:px-5 md:py-1.5 rounded-full tracking-[2px] md:tracking-[5px] text-[7px] md:text-[10px] font-bold whitespace-nowrap">
               SUPPORTED BY
             </div>
-            <div className="h-[1px] w-12 md:w-20 bg-orange-400"></div>
+            <div className="h-[1px] w-8 md:w-20 bg-orange-400"></div>
           </div>
 
         </div>

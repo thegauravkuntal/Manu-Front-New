@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   LayoutDashboard,
   Users,
@@ -29,7 +30,11 @@ import {
   Eye,
   Handshake,
   User,
-  Clock
+  Clock,
+  Star,
+  MapPin,
+  Factory,
+  Image
 } from "lucide-react";
 import GlobalSearchModal from "./components/GlobalSearchModal";
 import NotificationsDropdown from "./components/NotificationsDropdown";
@@ -43,7 +48,14 @@ import ExpirationsTab from "./components/ExpirationsTab";
 import ProfileTab from "./components/ProfileTab";
 import TableTab from "./components/TableTab";
 import PartnersTab from "./components/PartnersTab";
+import FooterTab from "./components/FooterTab";
 import Toast from "../../components/Toast";
+import FAQTab from "./components/FAQTab";
+import TestimonialTab from "./components/TestimonialTab";
+import CityTab from "./components/CityTab";
+import IndustryTab from "./components/IndustryTab";
+import SliderTab from "./components/SliderTab";
+import SEOTab from "./components/SEOTab";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -112,7 +124,7 @@ const Dashboard = () => {
     { id: 3, title: "Partner Verification Request", message: "Vikram Joshi requested seller verification", time: "2 hours ago", read: true, type: "Verifications" },
   ]);
 
-  const API_URL = import.meta.env.VITE_API_URL || "https://manu-back-bpob.onrender.com/api";
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001/api";
 
   const getFilteredItems = useCallback((items) => {
     if (!items || items.length === 0) return [];
@@ -138,25 +150,11 @@ const Dashboard = () => {
         return status.toLowerCase().includes(query);
       }
 
-      // Fallback Search
       const searchFields = [
-        item._id,
-        item.id,
-        item.orderId,
-        item.name,
-        item.title,
-        item.email,
-        item.companyName,
-        item.userId?.name,
-        item.userId?.email,
-        item.customer?.name,
-        item.customer?.email,
-        item.category,
-        item.status,
-        item.role,
-        item.verificationStatus,
-        item.message,
-        item.review
+        item._id, item.id, item.orderId, item.name, item.title, item.email,
+        item.companyName, item.userId?.name, item.userId?.email,
+        item.customer?.name, item.customer?.email, item.category,
+        item.status, item.role, item.verificationStatus, item.message, item.review
       ];
       return searchFields.some(field => field && String(field).toLowerCase().includes(query));
     });
@@ -168,7 +166,6 @@ const Dashboard = () => {
       const token = localStorage.getItem("token");
       const headers = { "Authorization": `Bearer ${token}` };
 
-      // Admin Profile from local storage
       const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
       if (savedUser.id || savedUser._id) {
         setAdminProfile({
@@ -179,17 +176,9 @@ const Dashboard = () => {
         });
       }
 
-      // Parallel fetching
       const [
-        statsRes,
-        usersRes,
-        servicesRes,
-        subsRes,
-        leadsRes,
-        productsRes,
-        catRes,
-        partnersRes,
-        navbarRes
+        statsRes, usersRes, servicesRes, subsRes, leadsRes,
+        productsRes, catRes, partnersRes, navbarRes
       ] = await Promise.all([
         fetch(`${API_URL}/admin/stats`, { headers }),
         fetch(`${API_URL}/admin/users`, { headers }),
@@ -202,26 +191,10 @@ const Dashboard = () => {
         fetch(`${API_URL}/navbar`)
       ]);
 
-      const [
-        statsData,
-        usersData,
-        servicesData,
-        subsData,
-        leadsData,
-        productsData,
-        catData,
-        partnersData,
-        navbarData
-      ] = await Promise.all([
-        statsRes.json(),
-        usersRes.json(),
-        servicesRes.json(),
-        subsRes.json(),
-        leadsRes.json(),
-        productsRes.json(),
-        catRes.json(),
-        partnersRes.json(),
-        navbarRes.json()
+      const [statsData, usersData, servicesData, subsData, leadsData,
+        productsData, catData, partnersData, navbarData] = await Promise.all([
+        statsRes.json(), usersRes.json(), servicesRes.json(), subsRes.json(), leadsRes.json(),
+        productsRes.json(), catRes.json(), partnersRes.json(), navbarRes.json()
       ]);
 
       if (statsData.success) setRealStats(statsData.stats);
@@ -245,7 +218,6 @@ const Dashboard = () => {
         setShowMainCategory(navbarData.navbar.showMainCategory !== false);
         if (navbarData.navbar._id) setNavbarId(navbarData.navbar._id);
       }
-
     } catch (err) {
       console.error("Dashboard Fetch Error:", err);
     } finally {
@@ -263,21 +235,13 @@ const Dashboard = () => {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_URL}/navbar/${navbarId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ showMainCategory: !showMainCategory })
       });
       const data = await res.json();
-      if (data.success) {
-        setShowMainCategory(!showMainCategory);
-      } else {
-        alert(data.msg || "Failed to update visibility.");
-      }
-    } catch (err) {
-      console.error("Toggle visibility error:", err);
-    }
+      if (data.success) setShowMainCategory(!showMainCategory);
+      else alert(data.msg || "Failed to update visibility.");
+    } catch (err) { console.error("Toggle visibility error:", err); }
   };
 
   const handleVerification = async (id, status) => {
@@ -286,21 +250,13 @@ const Dashboard = () => {
         const token = localStorage.getItem("token");
         const res = await fetch(`${API_URL}/admin/partner-profiles/${id}/verify`, {
           method: "PUT",
-          headers: { 
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}` 
-          },
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
           body: JSON.stringify({ status })
         });
         const data = await res.json();
-        if (data.success) {
-          setPartnerProfiles(partnerProfiles.map(p => p._id === id ? data.profile : p));
-        } else {
-          alert(data.msg || "Failed to update status.");
-        }
-      } catch (err) {
-        console.error("Verification error:", err);
-      }
+        if (data.success) setPartnerProfiles(partnerProfiles.map(p => p._id === id ? data.profile : p));
+        else alert(data.msg || "Failed to update status.");
+      } catch (err) { console.error("Verification error:", err); }
     }
   };
 
@@ -313,14 +269,9 @@ const Dashboard = () => {
           headers: { "Authorization": `Bearer ${token}` }
         });
         const data = await res.json();
-        if (data.success) {
-          fetchData();
-        } else {
-          alert(data.msg || "Failed to delete item.");
-        }
-      } catch (err) {
-        console.error("Delete error:", err);
-      }
+        if (data.success) fetchData();
+        else alert(data.msg || "Failed to delete item.");
+      } catch (err) { console.error("Delete error:", err); }
     }
   };
 
@@ -366,25 +317,12 @@ const Dashboard = () => {
     e.preventDefault();
     if (!editingItem || isSubmitting) return;
 
-    if (activeMenu === "Products") {
-      const shortLen = (formData.shortDescription || "").trim().length;
-      const longLen = (formData.longDescription || "").trim().length;
-      if (shortLen < 10) {
-        alert(`Short description must be at least 10 characters (you have ${shortLen}).`);
-        return;
-      }
-      if (longLen < 10) {
-        alert(`Long description must be at least 10 characters (you have ${longLen}).`);
-        return;
-      }
-    }
-
     try {
       setIsSubmitting(true);
       const token = localStorage.getItem("token");
       const endpoint = activeMenu === "Products" ? "products" : 
                       activeMenu === "Sub Categories" ? "categories" :
-                       activeMenu === "Main Categories" ? "manufacturing" :
+                      activeMenu === "Main Categories" ? "manufacturing" :
                       activeMenu === "Users" ? "admin/users" :
                       activeMenu === "Orders" ? "admin/orders" :
                       activeMenu === "Subscribers" ? "admin/subscribers" :
@@ -393,26 +331,18 @@ const Dashboard = () => {
       
       if (!endpoint) return;
 
-      let fetchOptions = {
-        method: "PUT",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      };
+      let fetchOptions = { method: "PUT", headers: { "Authorization": `Bearer ${token}` } };
 
       if (["Products", "Sub Categories", "Main Categories"].includes(activeMenu)) {
         const formDataObj = new FormData();
         Object.keys(formData).forEach(key => {
           if (formData[key] !== "" && formData[key] !== null && formData[key] !== undefined) {
-             formDataObj.append(key, formData[key]);
+            formDataObj.append(key, formData[key]);
           }
         });
         if (imageFile) {
-          if (Array.isArray(imageFile)) {
-            imageFile.forEach(file => formDataObj.append("image", file));
-          } else {
-            formDataObj.append("image", imageFile);
-          }
+          if (Array.isArray(imageFile)) imageFile.forEach(file => formDataObj.append("image", file));
+          else formDataObj.append("image", imageFile);
         }
         fetchOptions.body = formDataObj;
       } else {
@@ -421,81 +351,43 @@ const Dashboard = () => {
       }
 
       const res = await fetch(`${API_URL}/${endpoint}/${editingItem._id}`, fetchOptions);
-
       const data = await res.json();
       if (data.success) {
         setIsEditModalOpen(false);
         setEditingItem(null);
         fetchData();
         setToast({ message: "Updated successfully!", type: "success" });
-      } else {
-        alert(data.msg || "Error updating item");
-      }
-    } catch (err) {
-      console.error("Edit Error:", err);
-    } finally {
-      setIsSubmitting(false);
-    }
+      } else alert(data.msg || "Error updating item");
+    } catch (err) { console.error("Edit Error:", err); }
+    finally { setIsSubmitting(false); }
   };
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
 
-    if (activeMenu === "Products") {
-      const shortLen = (formData.shortDescription || "").trim().length;
-      const longLen = (formData.longDescription || "").trim().length;
-      if (shortLen < 10) {
-        alert(`Short description must be at least 10 characters (you have ${shortLen}).`);
-        return;
-      }
-      if (longLen < 10) {
-        alert(`Long description must be at least 10 characters (you have ${longLen}).`);
-        return;
-      }
-      if (!imageFile || (Array.isArray(imageFile) && imageFile.length === 0)) {
-        alert("Please upload at least one product image.");
-        return;
-      }
-      if (!formData.partnerId) {
-        alert("Please select an assigned partner (supplier).");
-        return;
-      }
-    }
-
     try {
       setIsSubmitting(true);
       const token = localStorage.getItem("token");
       const endpoint = activeMenu === "Products" ? "products" : 
                       activeMenu === "Sub Categories" ? "categories" :
-                       activeMenu === "Main Categories" ? "manufacturing" :
+                      activeMenu === "Main Categories" ? "manufacturing" :
                       activeMenu === "Users" ? "admin/users" : "";
       
-      if (!endpoint) {
-        setIsSubmitting(false);
-        return;
-      }
+      if (!endpoint) { setIsSubmitting(false); return; }
 
-      let fetchOptions = {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      };
+      let fetchOptions = { method: "POST", headers: { "Authorization": `Bearer ${token}` } };
 
       if (["Products", "Sub Categories", "Main Categories"].includes(activeMenu)) {
         const formDataObj = new FormData();
         Object.keys(formData).forEach(key => {
           if (formData[key] !== "" && formData[key] !== null && formData[key] !== undefined) {
-             formDataObj.append(key, formData[key]);
+            formDataObj.append(key, formData[key]);
           }
         });
         if (imageFile) {
-          if (Array.isArray(imageFile)) {
-            imageFile.forEach(file => formDataObj.append("image", file));
-          } else {
-            formDataObj.append("image", imageFile);
-          }
+          if (Array.isArray(imageFile)) imageFile.forEach(file => formDataObj.append("image", file));
+          else formDataObj.append("image", imageFile);
         }
         fetchOptions.body = formDataObj;
       } else {
@@ -504,287 +396,77 @@ const Dashboard = () => {
       }
 
       const res = await fetch(`${API_URL}/${endpoint}`, fetchOptions);
-
       const data = await res.json();
       if (data.success) {
         setIsAddModalOpen(false);
-        setFormData({ 
-          title: "", 
-          slug: "",
-          name: "", 
-          email: "", 
-          phone: "",
-          category: "", 
-          subcategory: "", 
-          subcategories: "", 
-          price: "", 
-          location: "Delhi", 
-          description: "", 
-          shortDescription: "",
-          longDescription: "",
-          mobileNumber: "",
-          partnerId: "",
-          status: "Active", 
-          role: "user",
-          project: "",
-          budget: "",
-          notes: "",
-          rating: "0",
-          tag: "",
-          paymentStatus: "Unpaid"
-        });
+        setFormData({ title: "", slug: "", name: "", email: "", phone: "", category: "", subcategory: "", subcategories: "", price: "", location: "Delhi", description: "", shortDescription: "", longDescription: "", mobileNumber: "", partnerId: "", status: "Active", role: "user", project: "", budget: "", notes: "", rating: "0", tag: "", paymentStatus: "Unpaid" });
         setImageFile(null);
         fetchData();
         setToast({ message: `${activeMenu.slice(0, -1)} added successfully!`, type: "success" });
-      } else {
-        alert(data.msg || "Error adding item");
-      }
-    } catch (err) {
-      console.error("Add Error:", err);
-    } finally {
-      setIsSubmitting(false);
-    }
+      } else alert(data.msg || "Error adding item");
+    } catch (err) { console.error("Add Error:", err); }
+    finally { setIsSubmitting(false); }
   };
 
   const menuItems = [
-    {
-      name: "Dashboard",
-      icon: <LayoutDashboard size={16} />,
-    },
-    {
-      name: "Users",
-      icon: <Users size={16} />,
-    },
-    {
-      name: "Partners",
-      icon: <Handshake size={16} />,
-    },
-    {
-      name: "Leads",
-      icon: <Briefcase size={16} />,
-    },
-    {
-      name: "Main Categories",
-      icon: <Briefcase size={16} />,
-    },
-    {
-      name: "Sub Categories",
-      icon: <Folder size={16} />,
-    },
-    {
-      name: "Products",
-      icon: <Package size={16} />,
-    },
-    {
-      name: "Subscribers",
-      icon: <Mail size={16} />,
-    },
-    {
-      name: "Profile",
-      icon: <User size={16} />,
-    },
-{
-      name: "Verifications",
-      icon: <ShieldCheck size={16} />,
-    },
-    {
-      name: "Expirations",
-      icon: <Clock size={16} />,
-    },
+    { name: "Dashboard", icon: <LayoutDashboard size={16} /> },
+    { name: "Users", icon: <Users size={16} /> },
+    { name: "Partners", icon: <Handshake size={16} /> },
+    { name: "Leads", icon: <Briefcase size={16} /> },
+    { name: "Main Categories", icon: <Briefcase size={16} /> },
+    { name: "Sub Categories", icon: <Folder size={16} /> },
+    { name: "Products", icon: <Package size={16} /> },
+    { name: "Subscribers", icon: <Mail size={16} /> },
+    { name: "Cities", icon: <MapPin size={16} /> },
+    { name: "Industries", icon: <Factory size={16} /> },
+    { name: "Testimonials", icon: <Star size={16} /> },
+    { name: "Banner Slider", icon: <Image size={16} /> },
+    { name: "Profile", icon: <User size={16} /> },
+    { name: "Verifications", icon: <ShieldCheck size={16} /> },
+    { name: "Expirations", icon: <Clock size={16} /> },
+    { name: "Footer", icon: <FileText size={16} /> },
+    { name: "FAQ", icon: <MessageSquare size={16} /> },
+    { name: "SEO Manager", icon: <Search size={16} /> },
   ];
 
   const stats = [
-    {
-      title: "Total Users",
-      value: realStats?.totalUsers || "1,245",
-      growth: "12.5%",
-      icon: <Users size={15} />,
-      bg: "from-blue-600 to-orange-600",
-    },
-    {
-      title: "Total Products",
-      value: realStats?.totalProducts || "320",
-      growth: "8.2%",
-      icon: <Package size={15} />,
-      bg: "from-purple-500 to-violet-700",
-    },
-    {
-      title: "Total Revenue",
-      value: realStats ? `₹${(realStats.totalRevenue / 100000).toFixed(1)}L` : "₹1,25,430",
-      growth: "22.4%",
-      icon: <IndianRupee size={15} />,
-      bg: "from-blue-500 to-cyan-700",
-    },
-    {
-      title: "Total Leads",
-      value: realStats?.totalLeads || "890",
-      growth: "18.7%",
-      icon: <Users size={15} />,
-      bg: "from-orange-400 to-orange-600",
-    },
+    { title: "Total Users", value: realStats?.totalUsers || "1,245", growth: "12.5%", icon: <Users size={15} />, bg: "from-blue-600 to-orange-600" },
+    { title: "Total Products", value: realStats?.totalProducts || "320", growth: "8.2%", icon: <Package size={15} />, bg: "from-purple-500 to-violet-700" },
+    { title: "Total Revenue", value: realStats ? `₹${(realStats.totalRevenue / 100000).toFixed(1)}L` : "₹1,25,430", growth: "22.4%", icon: <IndianRupee size={15} />, bg: "from-blue-500 to-cyan-700" },
+    { title: "Total Leads", value: realStats?.totalLeads || "890", growth: "18.7%", icon: <Users size={15} />, bg: "from-orange-400 to-orange-600" },
   ];
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#020817] text-white">
-
-      {/* SIDEBAR */}
-      <Sidebar
-        sidebarOpen={sidebarOpen}
-        menuItems={menuItems}
-        activeMenu={activeMenu}
-        setActiveMenu={setActiveMenu}
-        adminProfile={adminProfile}
-      />
-
-      {/* MAIN */}
+      <Sidebar sidebarOpen={sidebarOpen} menuItems={menuItems} activeMenu={activeMenu} setActiveMenu={setActiveMenu} adminProfile={adminProfile} />
       <main className="flex-1 flex flex-col overflow-hidden">
-
-        {/* HEADER */}
-        <AdminHeader
-          setSidebarOpen={setSidebarOpen}
-          sidebarOpen={sidebarOpen}
-          setShowGlobalSearch={setShowGlobalSearch}
-          showNotifications={showNotifications}
-          setShowNotifications={setShowNotifications}
-          notifications={notifications}
-          setNotifications={setNotifications}
-          setActiveMenu={setActiveMenu}
-          adminProfile={adminProfile}
-        />
-
-        {/* CONTENT */}
+        <AdminHeader setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} setShowGlobalSearch={setShowGlobalSearch} showNotifications={showNotifications} setShowNotifications={setShowNotifications} notifications={notifications} setNotifications={setNotifications} setActiveMenu={setActiveMenu} adminProfile={adminProfile} />
         <div className="flex-1 p-4 overflow-hidden flex flex-col">
-
-          {/* DASHBOARD PAGE */}
-          {activeMenu === "Dashboard" && (
-            <OverviewTab
-              stats={stats}
-              setActiveMenu={setActiveMenu}
-              leads={leads}
-            />
+          {activeMenu === "Dashboard" && (<OverviewTab stats={stats} setActiveMenu={setActiveMenu} leads={leads} />)}
+          
+          {activeMenu !== "Dashboard" && activeMenu !== "Profile" && activeMenu !== "Verifications" && activeMenu !== "Partners" && activeMenu !== "Expirations" && activeMenu !== "Footer" && activeMenu !== "FAQ" && activeMenu !== "Testimonials" && activeMenu !== "Cities" && activeMenu !== "Industries" && activeMenu !== "Banner Slider" && (
+            <TableTab activeMenu={activeMenu} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} setIsAddModalOpen={setIsAddModalOpen} getFilteredItems={getFilteredItems} handleEditClick={handleEditClick} handleDelete={handleDelete} showMainCategory={showMainCategory} navbarId={navbarId} onToggleMainCategoryVisibility={handleToggleMainCategoryVisibility} users={users} services={services} subscribers={subscribers} leads={leads} products={products} categories={categories} productCategoryNames={productCategoryNames} partnerProfiles={partnerProfiles} navigate={navigate} />
           )}
-
-          {/* OTHER PAGES */}
-          {activeMenu !== "Dashboard" && activeMenu !== "Profile" && activeMenu !== "Verifications" && activeMenu !== "Partners" && activeMenu !== "Expirations" && (
-            <TableTab
-              activeMenu={activeMenu}
-              search={search}
-              setSearch={setSearch}
-              filter={filter}
-              setFilter={setFilter}
-              setIsAddModalOpen={setIsAddModalOpen}
-              getFilteredItems={getFilteredItems}
-              handleEditClick={handleEditClick}
-              handleDelete={handleDelete}
-              showMainCategory={showMainCategory}
-              navbarId={navbarId}
-              onToggleMainCategoryVisibility={handleToggleMainCategoryVisibility}
-              users={users}
-              services={services}
-              subscribers={subscribers}
-              leads={leads}
-              products={products}
-              categories={categories}
-              productCategoryNames={productCategoryNames}
-              partnerProfiles={partnerProfiles}
-              navigate={navigate}
-            />
-          )}
-          {/* PARTNERS PAGE */}
-          {activeMenu === "Partners" && (
-            <PartnersTab
-              partnerProfiles={partnerProfiles}
-              getFilteredItems={getFilteredItems}
-              navigate={navigate}
-              search={search}
-              setSearch={setSearch}
-              filter={filter}
-              setFilter={setFilter}
-              onRefresh={fetchData}
-              handleEditClick={handleEditClick}
-            />
-          )}
-          {/* VERIFICATIONS PAGE */}
-          {activeMenu === "Verifications" && (
-            <VerificationsTab
-              partnerProfiles={partnerProfiles}
-              getFilteredItems={getFilteredItems}
-              handleVerification={handleVerification}
-              navigate={navigate}
-              search={search}
-              setSearch={setSearch}
-              filter={filter}
-              setFilter={setFilter}
-            />
-          )}
-          {/* EXPIRATIONS PAGE */}
-          {activeMenu === "Expirations" && (
-            <ExpirationsTab
-              partnerProfiles={partnerProfiles}
-              navigate={navigate}
-            />
-          )}
-          {/* PROFILE PAGE */}
-          {activeMenu === "Profile" && (
-            <ProfileTab
-              adminProfile={adminProfile}
-              setAdminProfile={setAdminProfile}
-            />
-          )}
+          
+          {activeMenu === "Partners" && (<PartnersTab partnerProfiles={partnerProfiles} getFilteredItems={getFilteredItems} navigate={navigate} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} onRefresh={fetchData} handleEditClick={handleEditClick} />)}
+          {activeMenu === "Verifications" && (<VerificationsTab partnerProfiles={partnerProfiles} getFilteredItems={getFilteredItems} handleVerification={handleVerification} navigate={navigate} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} />)}
+          {activeMenu === "Expirations" && (<ExpirationsTab partnerProfiles={partnerProfiles} navigate={navigate} />)}
+          {activeMenu === "Footer" && (<FooterTab onRefresh={fetchData} />)}
+          {activeMenu === "FAQ" && (<FAQTab onRefresh={fetchData} />)}
+          {activeMenu === "Testimonials" && (<TestimonialTab onRefresh={fetchData} />)}
+          {activeMenu === "Cities" && (<CityTab onRefresh={fetchData} />)}
+          {activeMenu === "Industries" && (<IndustryTab onRefresh={fetchData} />)}
+          {activeMenu === "Banner Slider" && (<SliderTab onRefresh={fetchData} />)}
+          {activeMenu === "Profile" && (<ProfileTab adminProfile={adminProfile} setAdminProfile={setAdminProfile} />)}
         </div>
       </main>
 
-      {/* EDIT MODAL */}
-      <EditModal
-        isOpen={isEditModalOpen}
-        onClose={() => { setIsEditModalOpen(false); setImageFile(null); }}
-        activeMenu={activeMenu}
-        formData={formData}
-        setFormData={setFormData}
-        imageFile={imageFile}
-        setImageFile={setImageFile}
-        onSubmit={handleEditSubmit}
-        categories={categories}
-        mainCategories={services}
-        partnerProfiles={partnerProfiles}
-        isSubmitting={isSubmitting}
-      />
+      <EditModal isOpen={isEditModalOpen} onClose={() => { setIsEditModalOpen(false); setImageFile(null); }} activeMenu={activeMenu} formData={formData} setFormData={setFormData} imageFile={imageFile} setImageFile={setImageFile} onSubmit={handleEditSubmit} categories={categories} mainCategories={services} partnerProfiles={partnerProfiles} isSubmitting={isSubmitting} />
+      <AddModal isOpen={isAddModalOpen} onClose={() => { setIsAddModalOpen(false); setImageFile(null); }} activeMenu={activeMenu} formData={formData} setFormData={setFormData} imageFile={imageFile} setImageFile={setImageFile} onSubmit={handleAddSubmit} categories={categories} mainCategories={services} partnerProfiles={partnerProfiles} isSubmitting={isSubmitting} />
 
-      {/* ADD MODAL */}
-      <AddModal
-        isOpen={isAddModalOpen}
-        onClose={() => { setIsAddModalOpen(false); setImageFile(null); }}
-        activeMenu={activeMenu}
-        formData={formData}
-        setFormData={setFormData}
-        imageFile={imageFile}
-        setImageFile={setImageFile}
-        onSubmit={handleAddSubmit}
-        categories={categories}
-        mainCategories={services}
-        partnerProfiles={partnerProfiles}
-        isSubmitting={isSubmitting}
-      />
+      <GlobalSearchModal isOpen={showGlobalSearch} onClose={() => { setShowGlobalSearch(false); setGlobalSearchQuery(""); }} searchQuery={globalSearchQuery} setSearchQuery={setGlobalSearchQuery} menuItems={menuItems} users={users} leads={leads} products={products} setActiveMenu={setActiveMenu} handleEditClick={handleEditClick} />
 
-      {/* GLOBAL SEARCH DIALOG (COMMAND+K) */}
-      <GlobalSearchModal
-        isOpen={showGlobalSearch}
-        onClose={() => { setShowGlobalSearch(false); setGlobalSearchQuery(""); }}
-        searchQuery={globalSearchQuery}
-        setSearchQuery={setGlobalSearchQuery}
-        menuItems={menuItems}
-        users={users}
-        leads={leads}
-        products={products}
-        setActiveMenu={setActiveMenu}
-        handleEditClick={handleEditClick}
-      />
-
-      {/* TOAST */}
-      {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
-      )}
-
+      {toast && (<Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />)}
     </div>
   );
 };

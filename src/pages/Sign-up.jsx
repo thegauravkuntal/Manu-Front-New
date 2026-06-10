@@ -1,15 +1,19 @@
-// components/auth/SignupForm.jsx
 import { Link } from "react-router-dom";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
+import logo from "../../assets/logo.png"; // 👈 ADJUST PATH ACCORDING TO YOUR FOLDER STRUCTURE
 
 const SignupForm = () => {
   return (
     <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8 border">
 
-      {/* LOGO */}
-      <h2 className="text-2xl font-bold text-center mb-2">
-        <span className="text-red-600">ULTRA</span>CLAP
-      </h2>
+      {/* LOGO - Text hata kar image lagayi */}
+      <div className="text-center mb-4">
+        <img
+          src={logo}
+          alt="UltraClap Logo"
+          className="h-12 mx-auto object-contain"
+        />
+      </div>
 
       <p className="text-center text-gray-500 mb-6">
         Create your account
@@ -24,7 +28,7 @@ const SignupForm = () => {
           <input
             type="text"
             placeholder="Full Name"
-            className="w-full pl-10 pr-3 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full pl-10 pr-3 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#1E3A8A]"
           />
         </div>
 
@@ -34,7 +38,7 @@ const SignupForm = () => {
           <input
             type="email"
             placeholder="Email address"
-            className="w-full pl-10 pr-3 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full pl-10 pr-3 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#1E3A8A]"
           />
         </div>
 
@@ -44,7 +48,7 @@ const SignupForm = () => {
           <input
             type="password"
             placeholder="Password"
-            className="w-full pl-10 pr-3 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full pl-10 pr-3 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#1E3A8A]"
           />
         </div>
 
@@ -54,7 +58,7 @@ const SignupForm = () => {
           <input
             type="password"
             placeholder="Confirm Password"
-            className="w-full pl-10 pr-3 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full pl-10 pr-3 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#1E3A8A]"
           />
         </div>
 
@@ -62,13 +66,13 @@ const SignupForm = () => {
         <label className="flex items-start gap-2 text-sm text-gray-600">
           <input type="checkbox" className="mt-1" />
           I agree to the{" "}
-          <span className="text-red-600 cursor-pointer">Terms & Conditions</span>
+          <span className="text-[#1E3A8A] cursor-pointer">Terms & Conditions</span>
         </label>
 
         {/* BUTTON */}
         <button
           type="submit"
-          className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-medium transition"
+          className="w-full bg-[#1E3A8A] hover:bg-[#1E40AF] text-white py-3 rounded-lg font-medium transition"
         >
           Create Account
         </button>
@@ -95,7 +99,7 @@ const SignupForm = () => {
       {/* FOOTER */}
       <p className="text-center text-sm text-gray-500 mt-6">
         Already have an account?{" "}
-        <Link to="/login" className="text-red-600 font-medium">
+        <Link to="/login" className="text-[#1E3A8A] font-medium">
           Sign In
         </Link>
       </p>

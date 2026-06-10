@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa";
 
 import loginImg from "../assets/signin-img.jpg";
+import logo from "../assets/logo.png"; // 👈 ADD THIS
 import { API_BASE_URL } from "../api/config";
 
 const SignInModal = ({ onClose, initialMode = "login" }) => {
@@ -236,12 +237,14 @@ const SignInModal = ({ onClose, initialMode = "login" }) => {
         {/* 🔥 RIGHT (Form Area) */}
         <div className="w-full md:w-1/2 p-8 md:p-10 flex flex-col justify-center">
 
-          {/* 🔥 LOGO */}
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-black tracking-tight">
-              <span className="text-[#1E3A8A]">ULTRA</span>CLAP
-            </h2>
-            <p className="text-gray-500 text-xs mt-1 font-medium uppercase tracking-widest">
+          {/* 🔥 LOGO - Text hata kar image lagayi */}
+          <div className="text-center mb-6">
+            <img
+              src={logo}
+              alt="UltraClap Logo"
+              className="h-12 mx-auto object-contain"
+            />
+            <p className="text-gray-500 text-xs mt-2 font-medium uppercase tracking-widest">
               {isLogin
                 ? "Sign in to your account"
                 : "Create your account"}
@@ -398,7 +401,7 @@ const SignInModal = ({ onClose, initialMode = "login" }) => {
 
 
           {/* 🔥 TOGGLE & FORGOT PASSWORD */}
-            <div className="text-center mt-8">
+            <div className="text-center mt-6">
               {isForgotPassword ? (
                 <>
                   <p className="text-xs text-gray-500 font-medium">
