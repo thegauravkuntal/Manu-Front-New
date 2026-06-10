@@ -421,12 +421,12 @@ const Dashboard = () => {
     { name: "Industries", icon: <Factory size={16} /> },
     { name: "Testimonials", icon: <Star size={16} /> },
     { name: "Banner Slider", icon: <Image size={16} /> },
+    { name: "SEO Manager", icon: <Search size={16} /> },
     { name: "Profile", icon: <User size={16} /> },
     { name: "Verifications", icon: <ShieldCheck size={16} /> },
     { name: "Expirations", icon: <Clock size={16} /> },
     { name: "Footer", icon: <FileText size={16} /> },
     { name: "FAQ", icon: <MessageSquare size={16} /> },
-    { name: "SEO Manager", icon: <Search size={16} /> },
   ];
 
   const stats = [
@@ -444,7 +444,7 @@ const Dashboard = () => {
         <div className="flex-1 p-4 overflow-hidden flex flex-col">
           {activeMenu === "Dashboard" && (<OverviewTab stats={stats} setActiveMenu={setActiveMenu} leads={leads} />)}
           
-          {activeMenu !== "Dashboard" && activeMenu !== "Profile" && activeMenu !== "Verifications" && activeMenu !== "Partners" && activeMenu !== "Expirations" && activeMenu !== "Footer" && activeMenu !== "FAQ" && activeMenu !== "Testimonials" && activeMenu !== "Cities" && activeMenu !== "Industries" && activeMenu !== "Banner Slider" && (
+          {activeMenu !== "Dashboard" && activeMenu !== "Profile" && activeMenu !== "Verifications" && activeMenu !== "Partners" && activeMenu !== "Expirations" && activeMenu !== "Footer" && activeMenu !== "FAQ" && activeMenu !== "Testimonials" && activeMenu !== "Cities" && activeMenu !== "Industries" && activeMenu !== "Banner Slider" && activeMenu !== "SEO Manager" && (
             <TableTab activeMenu={activeMenu} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} setIsAddModalOpen={setIsAddModalOpen} getFilteredItems={getFilteredItems} handleEditClick={handleEditClick} handleDelete={handleDelete} showMainCategory={showMainCategory} navbarId={navbarId} onToggleMainCategoryVisibility={handleToggleMainCategoryVisibility} users={users} services={services} subscribers={subscribers} leads={leads} products={products} categories={categories} productCategoryNames={productCategoryNames} partnerProfiles={partnerProfiles} navigate={navigate} />
           )}
           
@@ -457,6 +457,7 @@ const Dashboard = () => {
           {activeMenu === "Cities" && (<CityTab onRefresh={fetchData} />)}
           {activeMenu === "Industries" && (<IndustryTab onRefresh={fetchData} />)}
           {activeMenu === "Banner Slider" && (<SliderTab onRefresh={fetchData} />)}
+          {activeMenu === "SEO Manager" && (<SEOTab onRefresh={fetchData} />)}
           {activeMenu === "Profile" && (<ProfileTab adminProfile={adminProfile} setAdminProfile={setAdminProfile} />)}
         </div>
       </main>

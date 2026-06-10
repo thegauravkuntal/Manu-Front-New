@@ -74,7 +74,7 @@ const TableTab = ({
             </button>
           )}
 
-          {activeMenu !== "Users" && (
+          {activeMenu !== "Users" && activeMenu !== "Cities" && activeMenu !== "Industries" && activeMenu !== "Testimonials" && activeMenu !== "FAQ" && activeMenu !== "Banner Slider" && activeMenu !== "SEO Manager" && (
             <button 
               onClick={() => setIsAddModalOpen(true)}
               className="h-[38px] px-4 rounded-lg bg-orange-500 hover:bg-blue-600 transition-all duration-300 flex items-center gap-2 text-[11px] font-medium"

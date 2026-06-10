@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Save, RotateCcw, X } from "lucide-react";
+import { Save, RotateCcw, X, Upload, Image as ImageIcon } from "lucide-react";
 
 const API_URL = "http://localhost:5001/api";
 
 const SEOTab = ({ onRefresh }) => {
   const [pages, setPages] = useState([]);
   const [selectedPage, setSelectedPage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [ogImageFile, setOgImageFile] = useState(null);
+  const [ogImagePreview, setOgImagePreview] = useState(null);
+  const [message, setMessage] = useState({ text: "", type: "" });
+  
   const [seoData, setSeoData] = useState({
     pageName: "",
     pageSlug: "",
@@ -21,10 +27,8 @@ const SEOTab = ({ onRefresh }) => {
     h1Tag: "",
     robotsIndex: "index",
     robotsFollow: "follow",
+    isActive: true,
   });
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState({ text: "", type: "" });
 
   // Fetch all pages for dropdown
   useEffect(() => {
@@ -50,7 +54,15 @@ const SEOTab = ({ onRefresh }) => {
       const res = await fetch(`${API_URL}/seo/${pageSlug}`);
       const data = await res.json();
       if (data.success) {
-        setSeoData(data.seo);
+        setSeoData({
+          ...data.seo,
+          schemaJson: typeof data.seo.schemaJson === "object" 
+            ? JSON.stringify(data.seo.schemaJson, null, 2) 
+            : data.seo.schemaJson || "",
+        });
+        if (data.seo.ogImage) {
+          setOgImagePreview(data.seo.ogImage);
+        }
       }
     } catch (error) {
       console.error("Error fetching SEO:", error);
@@ -64,12 +76,42 @@ const SEOTab = ({ onRefresh }) => {
     setSelectedPage(slug);
     if (slug) {
       fetchSEOData(slug);
+    } else {
+      setSeoData({
+        pageName: "",
+        pageSlug: "",
+        metaTitle: "",
+        metaDescription: "",
+        metaKeywords: "",
+        ogTitle: "",
+        ogDescription: "",
+        ogImage: "",
+        ogType: "website",
+        schemaJson: "",
+        canonicalUrl: "",
+        h1Tag: "",
+        robotsIndex: "index",
+        robotsFollow: "follow",
+        isActive: true,
+      });
+      setOgImagePreview(null);
     }
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setSeoData({ ...seoData, [name]: value });
+    const { name, value, type, checked } = e.target;
+    setSeoData({
+      ...seoData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleOgImageUpload = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setOgImageFile(file);
+      setOgImagePreview(URL.createObjectURL(file));
+    }
   };
 
   const handleSave = async () => {
@@ -78,18 +120,46 @@ const SEOTab = ({ onRefresh }) => {
     
     try {
       const token = localStorage.getItem("token");
+      
+      // If new image uploaded, upload to Cloudinary first
+      let ogImageUrl = seoData.ogImage;
+      if (ogImageFile) {
+        const formData = new FormData();
+        formData.append("image", ogImageFile);
+        
+        const uploadRes = await fetch(`${API_URL}/upload`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          },
+          body: formData
+        });
+        const uploadData = await uploadRes.json();
+        if (uploadData.success) {
+          ogImageUrl = uploadData.url;
+        }
+      }
+      
+      const finalData = {
+        ...seoData,
+        pageSlug: selectedPage,
+        ogImage: ogImageUrl,
+        schemaJson: seoData.schemaJson ? JSON.parse(seoData.schemaJson) : null,
+      };
+      
       const res = await fetch(`${API_URL}/seo`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(seoData)
+        body: JSON.stringify(finalData)
       });
       
       const data = await res.json();
       if (data.success) {
         setMessage({ text: "SEO saved successfully!", type: "success" });
+        setOgImageFile(null);
         if (onRefresh) onRefresh();
         setTimeout(() => setMessage({ text: "", type: "" }), 3000);
       } else {
@@ -97,7 +167,7 @@ const SEOTab = ({ onRefresh }) => {
       }
     } catch (error) {
       console.error("Error:", error);
-      setMessage({ text: "Server error", type: "error" });
+      setMessage({ text: "Invalid JSON in Schema Markup", type: "error" });
     } finally {
       setSaving(false);
     }
@@ -113,18 +183,8 @@ const SEOTab = ({ onRefresh }) => {
       <div className="flex justify-between items-center mb-6 flex-shrink-0">
         <div>
           <h2 className="text-xl font-semibold text-white">SEO Manager</h2>
-          <p className="text-gray-400 text-sm mt-1">Manage SEO for all pages</p>
+          <p className="text-gray-400 text-sm mt-1">Manage SEO meta tags for website pages</p>
         </div>
-        {selectedPage && (
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors disabled:bg-orange-300"
-          >
-            <Save size={16} />
-            {saving ? "Saving..." : "Save SEO"}
-          </button>
-        )}
       </div>
 
       {/* Message */}
@@ -166,7 +226,7 @@ const SEOTab = ({ onRefresh }) => {
             
             {/* Basic SEO Section */}
             <div className="bg-[#1a2332] rounded-lg p-4 border border-white/10">
-              <h3 className="text-white font-semibold mb-4 border-b border-white/10 pb-2">📄 Basic SEO</h3>
+              <h3 className="text-white font-semibold mb-4 border-b border-white/10 pb-2">📄 SEO Information</h3>
               
               <div className="space-y-4">
                 {/* Meta Title */}
@@ -190,6 +250,19 @@ const SEOTab = ({ onRefresh }) => {
                   </div>
                 </div>
 
+                {/* Meta Keywords */}
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1">Meta Keywords (comma separated)</label>
+                  <input
+                    type="text"
+                    name="metaKeywords"
+                    value={seoData.metaKeywords || ""}
+                    onChange={handleChange}
+                    className="w-full p-2 bg-[#0f1724] border border-white/10 rounded-lg text-white focus:outline-none focus:border-orange-500"
+                    placeholder="Enter meta keywords (comma separated)"
+                  />
+                </div>
+
                 {/* Meta Description */}
                 <div>
                   <label className="block text-gray-300 text-sm mb-1">
@@ -210,79 +283,12 @@ const SEOTab = ({ onRefresh }) => {
                     {getCharCount(seoData.metaDescription, 155)} characters
                   </div>
                 </div>
-
-                {/* Meta Keywords */}
-                <div>
-                  <label className="block text-gray-300 text-sm mb-1">Meta Keywords (comma separated)</label>
-                  <input
-                    type="text"
-                    name="metaKeywords"
-                    value={seoData.metaKeywords || ""}
-                    onChange={handleChange}
-                    className="w-full p-2 bg-[#0f1724] border border-white/10 rounded-lg text-white focus:outline-none focus:border-orange-500"
-                    placeholder="seo, web development, react, nodejs"
-                  />
-                </div>
-
-                {/* H1 Tag */}
-                <div>
-                  <label className="block text-gray-300 text-sm mb-1">H1 Tag</label>
-                  <input
-                    type="text"
-                    name="h1Tag"
-                    value={seoData.h1Tag || ""}
-                    onChange={handleChange}
-                    className="w-full p-2 bg-[#0f1724] border border-white/10 rounded-lg text-white focus:outline-none focus:border-orange-500"
-                    placeholder="Main heading of the page"
-                  />
-                </div>
-
-                {/* Canonical URL */}
-                <div>
-                  <label className="block text-gray-300 text-sm mb-1">Canonical URL</label>
-                  <input
-                    type="url"
-                    name="canonicalUrl"
-                    value={seoData.canonicalUrl || ""}
-                    onChange={handleChange}
-                    className="w-full p-2 bg-[#0f1724] border border-white/10 rounded-lg text-white focus:outline-none focus:border-orange-500"
-                    placeholder="https://yourwebsite.com/current-page"
-                  />
-                </div>
-
-                {/* Robots Meta */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-gray-300 text-sm mb-1">Index/Noindex</label>
-                    <select
-                      name="robotsIndex"
-                      value={seoData.robotsIndex || "index"}
-                      onChange={handleChange}
-                      className="w-full p-2 bg-[#0f1724] border border-white/10 rounded-lg text-white focus:outline-none focus:border-orange-500"
-                    >
-                      <option value="index">Index</option>
-                      <option value="noindex">No Index</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-gray-300 text-sm mb-1">Follow/Nofollow</label>
-                    <select
-                      name="robotsFollow"
-                      value={seoData.robotsFollow || "follow"}
-                      onChange={handleChange}
-                      className="w-full p-2 bg-[#0f1724] border border-white/10 rounded-lg text-white focus:outline-none focus:border-orange-500"
-                    >
-                      <option value="follow">Follow</option>
-                      <option value="nofollow">No Follow</option>
-                    </select>
-                  </div>
-                </div>
               </div>
             </div>
 
             {/* Open Graph Section */}
             <div className="bg-[#1a2332] rounded-lg p-4 border border-white/10">
-              <h3 className="text-white font-semibold mb-4 border-b border-white/10 pb-2">📱 Open Graph (Social Media)</h3>
+              <h3 className="text-white font-semibold mb-4 border-b border-white/10 pb-2">📱 Open Graph Tags (Social Media)</h3>
               
               <div className="space-y-4">
                 <div>
@@ -307,17 +313,39 @@ const SEOTab = ({ onRefresh }) => {
                     placeholder="Description for social media shares"
                   />
                 </div>
+                
+                {/* OG Image Upload */}
                 <div>
-                  <label className="block text-gray-300 text-sm mb-1">OG Image URL</label>
-                  <input
-                    type="url"
-                    name="ogImage"
-                    value={seoData.ogImage || ""}
-                    onChange={handleChange}
-                    className="w-full p-2 bg-[#0f1724] border border-white/10 rounded-lg text-white focus:outline-none focus:border-orange-500"
-                    placeholder="https://yourwebsite.com/social-preview.jpg"
-                  />
+                  <label className="block text-gray-300 text-sm mb-1">OG Image</label>
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <label className="cursor-pointer">
+                      <div className="flex items-center gap-2 px-4 py-2 bg-[#0f1724] border border-white/10 rounded-lg text-gray-300 hover:border-orange-500 transition-colors">
+                        <Upload size={16} />
+                        <span>Upload OG Image</span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleOgImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    {ogImagePreview && (
+                      <div className="flex items-center gap-2">
+                        <img src={ogImagePreview} alt="OG Preview" className="w-12 h-12 rounded-lg object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => { setOgImagePreview(null); setOgImageFile(null); setSeoData({...seoData, ogImage: ""}); }}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-gray-500 text-xs mt-1">Recommended size: 1200 x 630 pixels</p>
                 </div>
+
                 <div>
                   <label className="block text-gray-300 text-sm mb-1">OG Type</label>
                   <select
@@ -343,22 +371,77 @@ const SEOTab = ({ onRefresh }) => {
                 <label className="block text-gray-300 text-sm mb-1">JSON-LD Schema</label>
                 <textarea
                   name="schemaJson"
-                  value={typeof seoData.schemaJson === "object" ? JSON.stringify(seoData.schemaJson, null, 2) : seoData.schemaJson || ""}
+                  value={seoData.schemaJson || ""}
                   onChange={handleChange}
-                  rows="8"
+                  rows="10"
                   className="w-full p-2 bg-[#0f1724] border border-white/10 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-orange-500"
-                  placeholder='{
+                  placeholder={`{
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "Your Company",
   "url": "https://yourwebsite.com"
-}'
+}`}
                 />
-                <p className="text-gray-500 text-xs mt-1">Paste valid JSON-LD schema markup</p>
+                <p className="text-gray-500 text-xs mt-1">Paste valid JSON-LD schema markup for rich results</p>
               </div>
             </div>
 
-            {/* Save Button at Bottom */}
+            {/* Canonical URL */}
+            <div className="bg-[#1a2332] rounded-lg p-4 border border-white/10">
+              <h3 className="text-white font-semibold mb-4 border-b border-white/10 pb-2">🔗 Canonical Tag</h3>
+              
+              <div>
+                <label className="block text-gray-300 text-sm mb-1">Canonical URL</label>
+                <input
+                  type="url"
+                  name="canonicalUrl"
+                  value={seoData.canonicalUrl || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 bg-[#0f1724] border border-white/10 rounded-lg text-white focus:outline-none focus:border-orange-500"
+                  placeholder="https://yourwebsite.com/current-page"
+                />
+                <p className="text-gray-500 text-xs mt-1">Used to prevent duplicate content issues</p>
+              </div>
+            </div>
+
+            {/* H1 Tag */}
+            <div className="bg-[#1a2332] rounded-lg p-4 border border-white/10">
+              <h3 className="text-white font-semibold mb-4 border-b border-white/10 pb-2">📝 H1 Tag</h3>
+              
+              <div>
+                <label className="block text-gray-300 text-sm mb-1">Main Heading (H1)</label>
+                <input
+                  type="text"
+                  name="h1Tag"
+                  value={seoData.h1Tag || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 bg-[#0f1724] border border-white/10 rounded-lg text-white focus:outline-none focus:border-orange-500"
+                  placeholder="Main heading of the page"
+                />
+                <p className="text-gray-500 text-xs mt-1">Only one H1 tag per page recommended</p>
+              </div>
+            </div>
+
+            {/* Status Section */}
+            <div className="bg-[#1a2332] rounded-lg p-4 border border-white/10">
+              <h3 className="text-white font-semibold mb-4 border-b border-white/10 pb-2">⚙️ Status</h3>
+              
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2 text-gray-300 text-sm">
+                  <input
+                    type="checkbox"
+                    name="isActive"
+                    checked={seoData.isActive !== false}
+                    onChange={(e) => setSeoData({ ...seoData, isActive: e.target.checked })}
+                    className="w-4 h-4 rounded border-white/10 bg-[#0f1724] text-orange-500 focus:ring-orange-500"
+                  />
+                  Active
+                </label>
+                <span className="text-gray-500 text-xs">When active, meta tags will be applied to the page</span>
+              </div>
+            </div>
+
+            {/* Save Button */}
             <div className="flex justify-end pt-4 pb-2">
               <button
                 onClick={handleSave}
@@ -366,7 +449,7 @@ const SEOTab = ({ onRefresh }) => {
                 className="flex items-center gap-2 px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors disabled:bg-orange-300"
               >
                 <Save size={16} />
-                {saving ? "Saving..." : "Save SEO Settings"}
+                {saving ? "Saving..." : "SAVE SEO DATA"}
               </button>
             </div>
           </div>
