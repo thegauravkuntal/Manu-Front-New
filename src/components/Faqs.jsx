@@ -32,7 +32,7 @@ const FAQ = () => {
         try {
 
           const res =
-            await fetch(`${API_BASE_URL}/faqs`);
+            await fetch(`${API_BASE_URL}/faq`);
 
           const data =
             await res.json();

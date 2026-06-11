@@ -34,7 +34,8 @@ import {
   Star,
   MapPin,
   Factory,
-  Image
+  Image,
+  Navigation
 } from "lucide-react";
 import GlobalSearchModal from "./components/GlobalSearchModal";
 import NotificationsDropdown from "./components/NotificationsDropdown";
@@ -56,6 +57,9 @@ import CityTab from "./components/CityTab";
 import IndustryTab from "./components/IndustryTab";
 import SliderTab from "./components/SliderTab";
 import SEOTab from "./components/SEOTab";
+import NavbarTab from "./components/NavbarTab";
+import TopbarTab from "./components/TopbarTab";
+import HeroTab from "./components/HeroTab";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -421,6 +425,9 @@ const Dashboard = () => {
     { name: "Industries", icon: <Factory size={16} /> },
     { name: "Testimonials", icon: <Star size={16} /> },
     { name: "Banner Slider", icon: <Image size={16} /> },
+    { name: "Hero", icon: <LayoutDashboard size={16} /> },
+    { name: "Topbar", icon: <Menu size={16} /> },
+    { name: "Navbar", icon: <Navigation size={16} /> },
     { name: "SEO Manager", icon: <Search size={16} /> },
     { name: "Profile", icon: <User size={16} /> },
     { name: "Verifications", icon: <ShieldCheck size={16} /> },
@@ -444,7 +451,7 @@ const Dashboard = () => {
         <div className="flex-1 p-4 overflow-hidden flex flex-col">
           {activeMenu === "Dashboard" && (<OverviewTab stats={stats} setActiveMenu={setActiveMenu} leads={leads} />)}
           
-          {activeMenu !== "Dashboard" && activeMenu !== "Profile" && activeMenu !== "Verifications" && activeMenu !== "Partners" && activeMenu !== "Expirations" && activeMenu !== "Footer" && activeMenu !== "FAQ" && activeMenu !== "Testimonials" && activeMenu !== "Cities" && activeMenu !== "Industries" && activeMenu !== "Banner Slider" && activeMenu !== "SEO Manager" && (
+          {activeMenu !== "Dashboard" && activeMenu !== "Profile" && activeMenu !== "Verifications" && activeMenu !== "Partners" && activeMenu !== "Expirations" && activeMenu !== "Footer" && activeMenu !== "FAQ" && activeMenu !== "Testimonials" && activeMenu !== "Cities" && activeMenu !== "Industries" && activeMenu !== "Banner Slider" && activeMenu !== "Hero" && activeMenu !== "Topbar" && activeMenu !== "Navbar" && activeMenu !== "SEO Manager" && (
             <TableTab activeMenu={activeMenu} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} setIsAddModalOpen={setIsAddModalOpen} getFilteredItems={getFilteredItems} handleEditClick={handleEditClick} handleDelete={handleDelete} showMainCategory={showMainCategory} navbarId={navbarId} onToggleMainCategoryVisibility={handleToggleMainCategoryVisibility} users={users} services={services} subscribers={subscribers} leads={leads} products={products} categories={categories} productCategoryNames={productCategoryNames} partnerProfiles={partnerProfiles} navigate={navigate} />
           )}
           
@@ -457,6 +464,9 @@ const Dashboard = () => {
           {activeMenu === "Cities" && (<CityTab onRefresh={fetchData} />)}
           {activeMenu === "Industries" && (<IndustryTab onRefresh={fetchData} />)}
           {activeMenu === "Banner Slider" && (<SliderTab onRefresh={fetchData} />)}
+          {activeMenu === "Hero" && (<HeroTab onRefresh={fetchData} />)}
+          {activeMenu === "Topbar" && (<TopbarTab onRefresh={fetchData} />)}
+          {activeMenu === "Navbar" && (<NavbarTab onRefresh={fetchData} />)}
           {activeMenu === "SEO Manager" && (<SEOTab onRefresh={fetchData} />)}
           {activeMenu === "Profile" && (<ProfileTab adminProfile={adminProfile} setAdminProfile={setAdminProfile} />)}
         </div>
