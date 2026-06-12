@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Save, RotateCcw, X, Upload, Image as ImageIcon } from "lucide-react";
+import { Save, RotateCcw, X, Upload, Image as ImageIcon, Code } from "lucide-react";
 
 const API_URL = "http://localhost:5001/api";
 
@@ -28,6 +28,8 @@ const SEOTab = ({ onRefresh }) => {
     robotsIndex: "index",
     robotsFollow: "follow",
     isActive: true,
+    headCode: "",      // 🔥 ADDED
+    bodyCode: "",      // 🔥 ADDED
   });
 
   // Fetch all pages for dropdown
@@ -59,6 +61,8 @@ const SEOTab = ({ onRefresh }) => {
           schemaJson: typeof data.seo.schemaJson === "object" 
             ? JSON.stringify(data.seo.schemaJson, null, 2) 
             : data.seo.schemaJson || "",
+          headCode: data.seo.headCode || "",      // 🔥 ADDED
+          bodyCode: data.seo.bodyCode || "",      // 🔥 ADDED
         });
         if (data.seo.ogImage) {
           setOgImagePreview(data.seo.ogImage);
@@ -93,6 +97,8 @@ const SEOTab = ({ onRefresh }) => {
         robotsIndex: "index",
         robotsFollow: "follow",
         isActive: true,
+        headCode: "",      // 🔥 ADDED
+        bodyCode: "",      // 🔥 ADDED
       });
       setOgImagePreview(null);
     }
@@ -145,6 +151,8 @@ const SEOTab = ({ onRefresh }) => {
         pageSlug: selectedPage,
         ogImage: ogImageUrl,
         schemaJson: seoData.schemaJson ? JSON.parse(seoData.schemaJson) : null,
+        headCode: seoData.headCode || "",      // 🔥 ADDED
+        bodyCode: seoData.bodyCode || "",      // 🔥 ADDED
       };
       
       const res = await fetch(`${API_URL}/seo`, {
@@ -419,6 +427,84 @@ const SEOTab = ({ onRefresh }) => {
                   placeholder="Main heading of the page"
                 />
                 <p className="text-gray-500 text-xs mt-1">Only one H1 tag per page recommended</p>
+              </div>
+            </div>
+
+            {/* 🔥 ADVANCED SEO SECTION - HEAD/BODY CODE */}
+            <div className="bg-[#1a2332] rounded-lg p-4 border border-white/10">
+              <h3 className="text-white font-semibold mb-4 border-b border-white/10 pb-2 flex items-center gap-2">
+                <Code size={16} className="text-orange-400" />
+                ⚙️ Advanced SEO
+              </h3>
+              
+              <div className="space-y-4">
+                {/* Head Code */}
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1">
+                    Head Code (Analytics, Pixel, Verification)
+                  </label>
+                  <textarea
+                    name="headCode"
+                    value={seoData.headCode || ""}
+                    onChange={handleChange}
+                    rows="6"
+                    className="w-full p-3 bg-[#0f1724] border border-white/10 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-orange-500"
+                    placeholder={`<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+
+<!-- Facebook Pixel -->
+<script>
+  !function(f,b,e,v,n,t,s){...}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', 'YOUR_PIXEL_ID');
+  fbq('track', 'PageView');
+</script>
+
+<!-- Google Search Console Verification -->
+<meta name="google-site-verification" content="YOUR_VERIFICATION_CODE" />`}
+                  />
+                  <p className="text-gray-500 text-xs mt-1">
+                    Paste Google Analytics, Google Tag Manager, Facebook Pixel, Search Console verification, or any other code that needs to go in the &lt;head&gt; section.
+                  </p>
+                </div>
+
+                {/* Body Code */}
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1">
+                    Body Code (Chat Widgets, Scripts)
+                  </label>
+                  <textarea
+                    name="bodyCode"
+                    value={seoData.bodyCode || ""}
+                    onChange={handleChange}
+                    rows="4"
+                    className="w-full p-3 bg-[#0f1724] border border-white/10 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-orange-500"
+                    placeholder={`<!-- Live Chat Widget -->
+<script>
+  window.__lc = window.__lc || {};
+  window.__lc.license = YOUR_LICENSE_KEY;
+  (function() {
+    var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
+    lc.src = 'https://cdn.livechatinc.com/tracking.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
+  })();
+</script>
+
+<!-- Custom Script -->
+<script>
+  // Your custom JavaScript code here
+  console.log('Custom script loaded');
+</script>`}
+                  />
+                  <p className="text-gray-500 text-xs mt-1">
+                    Paste chat widgets, live support scripts, or any other code that needs to go before the closing &lt;/body&gt; tag.
+                  </p>
+                </div>
               </div>
             </div>
 

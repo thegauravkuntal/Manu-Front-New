@@ -14,6 +14,19 @@ import {
   FaLinkedin,
 } from "react-icons/fa";
 
+// 🔥 TRACKING FUNCTION (Direct - No Import Needed)
+const trackClick = async (buttonName) => {
+  try {
+    await fetch("http://localhost:5001/api/analytics/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ button: buttonName }),
+    });
+    console.log("✅ " + buttonName + " tracked");
+  } catch (error) {
+    console.error("Analytics error:", error);
+  }
+};
 
 // 🔥 IMAGES (ADD THESE)
 import img1 from "../assets/manufacturing.jpg";
@@ -64,7 +77,6 @@ const Hero = () => {
     );
   };
 
-
   // 🔥 AUTO SLIDE
   useEffect(() => {
     const interval = setInterval(() => {
@@ -98,9 +110,9 @@ const Hero = () => {
 
   // 🔥 SOCIAL ICONS
   const socials = [
-    { icon: <FaInstagram />, name: "Instagram", color: "text-pink-500" },
-    { icon: <FaYoutube />, name: "YouTube", color: "text-red-600" },
-    { icon: <FaLinkedin />, name: "LinkedIn", color: "text-blue-600" },
+    { icon: <FaInstagram />, name: "Instagram", color: "text-pink-500", buttonName: "instagram" },
+    { icon: <FaYoutube />, name: "YouTube", color: "text-red-600", buttonName: "youtube" },
+    { icon: <FaLinkedin />, name: "LinkedIn", color: "text-blue-600", buttonName: "linkedin" },
   ];
 
   return (
@@ -155,6 +167,7 @@ const Hero = () => {
           <div className={`absolute inset-0 bg-blue-500 opacity-20 rounded-full ${pulse ? "scale-[1.8]" : "scale-100"} transition-all duration-1000`} />
           <a 
             href="tel:+910000000000"
+            onClick={() => trackClick("call")}
             className="relative bg-blue-600 w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-white cursor-pointer shadow-2xl hover:scale-110 transition-all active:scale-90"
           >
             <FaPhoneAlt size={18} />
@@ -167,6 +180,7 @@ const Hero = () => {
             href="https://wa.me/910000000000"
             target="_blank"
             rel="noreferrer"
+            onClick={() => trackClick("whatsapp")}
             className="relative bg-green-500 w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-white cursor-pointer shadow-2xl hover:scale-110 transition-all active:scale-90"
           >
             <FaWhatsapp size={22} />
@@ -191,7 +205,10 @@ const Hero = () => {
               </span>
             )}
 
-            <div className="bg-white p-3 rounded-full shadow-lg cursor-pointer hover:scale-110 transition">
+            <div 
+              onClick={() => trackClick(s.buttonName)}
+              className="bg-white p-3 rounded-full shadow-lg cursor-pointer hover:scale-110 transition"
+            >
               <span className={`text-xl ${s.color}`}>{s.icon}</span>
             </div>
           </div>

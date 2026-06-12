@@ -12,6 +12,7 @@ import {
   FaChevronUp,
 } from "react-icons/fa";
 import { API_BASE_URL } from "../api/config";
+import { trackClick } from "../components/analytics";
 import logo from "../assets/logo.png";
 
 const DEFAULT_FOOTER = {
@@ -118,11 +119,29 @@ const Footer = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // 🔥 Handle social media click with analytics tracking
+  const handleSocialClick = (platform, url) => {
+    trackClick(platform);
+    window.open(url, "_blank", "noopener noreferrer");
+  };
+
+  // 🔥 Handle phone click with analytics tracking
+  const handlePhoneClick = (phone) => {
+    trackClick("call");
+    window.location.href = `tel:${phone?.replace(/\s/g, "")}`;
+  };
+
+  // 🔥 Handle email click with analytics tracking
+  const handleEmailClick = (email) => {
+    trackClick("email");
+    window.location.href = `mailto:${email}`;
+  };
+
   const socialLinks = [
-    { href: footer?.facebook, icon: FaFacebookF, label: "Facebook" },
-    { href: footer?.instagram, icon: FaInstagram, label: "Instagram" },
-    { href: footer?.linkedin, icon: FaLinkedinIn, label: "LinkedIn" },
-    { href: footer?.youtube, icon: FaYoutube, label: "YouTube" },
+    { href: footer?.facebook, icon: FaFacebookF, label: "facebook", platform: "facebook" },
+    { href: footer?.instagram, icon: FaInstagram, label: "instagram", platform: "instagram" },
+    { href: footer?.linkedin, icon: FaLinkedinIn, label: "linkedin", platform: "linkedin" },
+    { href: footer?.youtube, icon: FaYoutube, label: "youtube", platform: "youtube" },
   ].filter((s) => s.href && s.href.trim() !== "");
 
   if (loading) {
@@ -138,33 +157,30 @@ const Footer = () => {
   }
 
   return (
-<footer className="bg-gradient-to-b from-[#081426] via-[#0B1F3A] to-[#07101F] mt-16 pb-20 lg:pb-0">     
-   <div className="h-[2px] bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#F97316] w-full" />
+    <footer className="bg-gradient-to-b from-[#081426] via-[#0B1F3A] to-[#07101F] mt-16 pb-20 lg:pb-0">     
+      <div className="h-[2px] bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#F97316] w-full" />
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 text-center md:text-left">
         <div className="lg:col-span-2 flex flex-col items-center md:items-start">
-       <div className="mb-5">
-  <img
-    src={logo}
-    alt="UltraClap Logo"
-    className="h-[50px] md:h-[65px] w-auto object-contain"
-  />
-</div>
-
+          <div className="mb-5">
+            <img
+              src={logo}
+              alt="UltraClap Logo"
+              className="h-[50px] md:h-[65px] w-auto object-contain"
+            />
+          </div>
           <p className="text-gray-300 text-[15px] leading-8 max-w-md">{footer.about}</p>
 
           {socialLinks.length > 0 && (
             <div className="flex items-center gap-4 mt-7">
-              {socialLinks.map(({ href, icon: Icon, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={label}
-                  className="w-10 h-10 bg-[#13294B] text-white rounded-full shadow-lg flex items-center justify-center hover:bg-[#2563EB] transition"
+              {socialLinks.map(({ href, icon: Icon, platform }) => (
+                <button
+                  key={platform}
+                  onClick={() => handleSocialClick(platform, href)}
+                  aria-label={platform}
+                  className="w-10 h-10 bg-[#13294B] text-white rounded-full shadow-lg flex items-center justify-center hover:bg-[#2563EB] transition cursor-pointer"
                 >
                   <Icon />
-                </a>
+                </button>
               ))}
             </div>
           )}
@@ -202,9 +218,9 @@ const Footer = () => {
         </div>
 
         <div>
-        <h3 className="font-bold text-xl mb-5 text-white opacity-100">
-        {footer.projectHeading}
-        </h3>
+          <h3 className="font-bold text-xl mb-5 text-white opacity-100">
+            {footer.projectHeading}
+          </h3>
           <ul className="space-y-3 text-gray-300 text-sm">
             {footer.projectLinks?.map((item, index) => (
               <li key={index}>
@@ -231,22 +247,22 @@ const Footer = () => {
 
             <div className="flex items-center justify-center md:justify-start gap-3">
               <FaPhoneAlt className="text-[#4F7CFF] shrink-0" />
-              <a
-                href={`tel:${footer.phone?.replace(/\s/g, "")}`}
-                className="text-gray-300 hover:text-white transition"
+              <button
+                onClick={() => handlePhoneClick(footer.phone)}
+                className="text-gray-300 hover:text-white transition cursor-pointer"
               >
                 {footer.phone}
-              </a>
+              </button>
             </div>
 
             <div className="flex items-center justify-center md:justify-start gap-3">
               <FaEnvelope className="text-[#4F7CFF] shrink-0" />
-              <a
-                href={`mailto:${footer.email}`}
-                className="hover:text-[#4F7CFF] transition break-all"
+              <button
+                onClick={() => handleEmailClick(footer.email)}
+                className="hover:text-[#4F7CFF] transition break-all cursor-pointer"
               >
                 {footer.email}
-              </a>
+              </button>
             </div>
           </div>
         </div>

@@ -15,7 +15,7 @@ import {
 import LeadModal from "../components/LeadModal";
 import { API_BASE_URL, getServerUrl, getLocalFallback } from "../api/config";
 import { getProductUrl } from "../utils/urlHelpers";
-
+import { trackClick } from "../components/analytics";
 const ProductDetails = () => {
   const { id, slug, category, subcategory } = useParams();
   const { state } = useLocation();
@@ -101,6 +101,18 @@ const ProductDetails = () => {
 
     fetchRelatedProducts();
   }, [product]);
+
+  // 🔥 Handle call click with analytics tracking
+  const handleCallClick = () => {
+    trackClick("call");
+    setIsCallModalOpen(true);
+  };
+
+  // 🔥 Handle contact supplier click with analytics tracking
+  const handleContactClick = () => {
+    trackClick("contact");
+    setIsModalOpen(true);
+  };
 
   if (loadingProduct) {
     return (
@@ -339,14 +351,14 @@ const ProductDetails = () => {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={handleContactClick}
                   className="flex-1 bg-[#1E3A8A] hover:bg-[#1E40AF] text-white py-3 md:py-4 rounded-xl font-bold shadow-lg shadow-blue-900/10 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm md:text-base"
                 >
                   <FaEnvelope /> Contact Supplier
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsCallModalOpen(true)}
+                  onClick={handleCallClick}
                   className="flex-1 bg-white border-2 border-slate-200 text-slate-800 py-3 md:py-4 rounded-xl font-bold hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm md:text-base"
                 >
                   <FaPhoneAlt size={12} className="text-orange-500" /> Call Now
@@ -400,6 +412,7 @@ const ProductDetails = () => {
                     </p>
                     <a
                       href={`tel:${product.mobileNumber || "+919876543210"}`}
+                      onClick={() => trackClick("call")}
                       className="text-lg font-black text-slate-800 hover:text-orange-500 transition-colors flex items-center gap-1"
                     >
                       {product.mobileNumber || "+91 98765 43210"}{" "}
@@ -415,6 +428,7 @@ const ProductDetails = () => {
                 </div>
                 <a
                   href={`tel:${product.mobileNumber || "+919876543210"}`}
+                  onClick={() => trackClick("call")}
                   className="w-full py-3 bg-[#1E3A8A] text-white rounded-xl font-bold text-center hover:bg-[#1E40AF] transition-all flex items-center justify-center gap-2 text-sm"
                 >
                   <FaPhoneAlt size={12} /> Call Now

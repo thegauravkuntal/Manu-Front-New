@@ -1,6 +1,9 @@
 import { X, Package } from "lucide-react";
 import { useState } from "react";
 
+// 100KB LIMIT
+const MAX_FILE_SIZE = 100 * 1024; // 100KB in bytes
+
 const AddModal = ({
   isOpen,
   onClose,
@@ -16,14 +19,105 @@ const AddModal = ({
   isSubmitting = false
 }) => {
   const [descTab, setDescTab] = useState("short");
+  const [imageAltTexts, setImageAltTexts] = useState({});
+  
   if (!isOpen) return null;
+
+  // Validate image size (100KB limit)
+  const validateImageSize = (file) => {
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`Image "${file.name}" size ${(file.size / 1024).toFixed(2)}KB exceeds 100KB limit. Please compress your image.`);
+      return false;
+    }
+    return true;
+  };
+
+  const handleImageSelect = (files) => {
+    if (!files || files.length === 0) return;
+    
+    if (activeMenu === "Products") {
+      const fileArray = Array.isArray(files) ? files : [files];
+      const validFiles = fileArray.filter(validateImageSize);
+      if (validFiles.length !== fileArray.length) {
+        alert(`${fileArray.length - validFiles.length} file(s) skipped due to size > 100KB`);
+      }
+      if (validFiles.length > 0) {
+        setImageFile(prev => Array.isArray(prev) ? [...prev, ...validFiles] : validFiles);
+        // Initialize alt text for new files
+        const newAltTexts = { ...imageAltTexts };
+        const startIndex = Array.isArray(imageFile) ? imageFile.length : 0;
+        validFiles.forEach((file, idx) => {
+          newAltTexts[startIndex + idx] = "";
+        });
+        setImageAltTexts(newAltTexts);
+      }
+    } else {
+      const file = files[0] || files;
+      if (validateImageSize(file)) {
+        setImageFile(file);
+      }
+    }
+  };
 
   const removeFile = (index) => {
     if (Array.isArray(imageFile)) {
       const newFiles = imageFile.filter((_, i) => i !== index);
       setImageFile(newFiles);
+      // Remove alt text for deleted file
+      const newAltTexts = { ...imageAltTexts };
+      delete newAltTexts[index];
+      // Re-index remaining alt texts
+      const reindexed = {};
+      Object.keys(newAltTexts).forEach((key, newIdx) => {
+        reindexed[newIdx] = newAltTexts[key];
+      });
+      setImageAltTexts(reindexed);
     } else {
       setImageFile(null);
+    }
+  };
+
+  const handleAltTextChange = (index, altText) => {
+    setImageAltTexts(prev => ({
+      ...prev,
+      [index]: altText
+    }));
+  };
+
+  // Prepare data before submit
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    
+    // For products, attach alt texts to images
+    if (activeMenu === "Products" && Array.isArray(imageFile)) {
+      // Create a hidden input or modify formData
+      const altTextsArray = [];
+      for (let i = 0; i < imageFile.length; i++) {
+        altTextsArray.push(imageAltTexts[i] || "");
+      }
+      
+      // Create a new FormData object to properly send files and alt texts
+      const formDataObj = new FormData();
+      
+      // Add all form data fields
+      Object.keys(formData).forEach(key => {
+        if (formData[key] !== undefined && formData[key] !== null && formData[key] !== "") {
+          formDataObj.append(key, formData[key]);
+        }
+      });
+      
+      // Add images
+      imageFile.forEach(file => {
+        formDataObj.append("image", file);
+      });
+      
+      // Add alt texts as JSON string
+      formDataObj.append("imageAltTexts", JSON.stringify(altTextsArray));
+      
+      // Call onSubmit with the FormData object
+      onSubmit(formDataObj);
+    } else {
+      onSubmit(e);
     }
   };
 
@@ -47,7 +141,7 @@ const AddModal = ({
 
       <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#020817]">
         <div className="p-6 md:p-12">
-          <form onSubmit={onSubmit} className="max-w-7xl mx-auto space-y-8 bg-[#081120] border border-white/10 p-8 md:p-12 rounded-[40px] shadow-2xl">
+          <form onSubmit={handleFormSubmit} className="max-w-7xl mx-auto space-y-8 bg-[#081120] border border-white/10 p-8 md:p-12 rounded-[40px] shadow-2xl">
             {/* SUB CATEGORY FIELDS */}
           {activeMenu === "Sub Categories" && (
             <div className="space-y-4">
@@ -253,6 +347,17 @@ const AddModal = ({
                   <input type="text" value={formData.budget} onChange={(e) => setFormData({...formData, budget: e.target.value})} className="w-full bg-[#0b1220] border border-white/10 rounded-xl h-[45px] px-4 text-sm text-white focus:border-blue-600 outline-none transition-all" />
                 </div>
               </div>
+              <div className="space-y-2">
+                <label className="text-xs text-gray-400 font-bold uppercase tracking-wider">Status</label>
+                <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})} className="w-full bg-[#0b1220] border border-white/10 rounded-xl h-[45px] px-4 text-sm text-white focus:border-blue-600 outline-none transition-all">
+                  <option value="New">New</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Negotiation">Negotiation</option>
+                  <option value="Converted">Converted</option>
+                  <option value="Lost">Lost</option>
+                  <option value="Nurturing">Nurturing</option>
+                </select>
+              </div>
             </div>
           )}
 
@@ -302,63 +407,60 @@ const AddModal = ({
             </div>
           )}
 
-          {/* Image Upload */}
-          {["Products", "Sub Categories", "Main Categories"].includes(activeMenu) && (
+          {/* 🔥 PRODUCT IMAGES WITH ALT TEXT */}
+          {activeMenu === "Products" && (
             <div className="space-y-2 pb-4">
               <label className="text-xs text-gray-400 font-bold uppercase tracking-wider">
-                {activeMenu === "Sub Categories" ? "Subcategory Icon" : activeMenu === "Products" ? "Product Images (Multiple)" : "Image"}
+                Product Images (Multiple)
               </label>
               <div className="space-y-3">
+                <div className="text-xs text-gray-500">
+                  ⚠️ Image size must be less than <span className="text-orange-400 font-bold">100KB</span>
+                </div>
                 <input 
                   type="file" 
-                  multiple={activeMenu === "Products"}
-                  onChange={(e) => {
-                    if (activeMenu === "Products") {
-                      const files = Array.from(e.target.files);
-                      setImageFile(prev => Array.isArray(prev) ? [...prev, ...files] : files);
-                    } else {
-                      setImageFile(e.target.files[0]);
-                    }
-                  }}
+                  multiple
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={(e) => handleImageSelect(e.target.files)}
                   className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-orange-400 transition-all cursor-pointer" 
                 />
 
-                {/* Selected Files Preview */}
-                {imageFile && (
-                  <div className="space-y-2">
-                    {Array.isArray(imageFile) ? (
-                      <div className="grid grid-cols-2 gap-2">
-                        {imageFile.map((file, idx) => (
-                          <div key={idx} className="relative group bg-white/5 rounded-lg p-2 flex items-center gap-2 border border-white/5">
-                            <div className="w-8 h-8 rounded bg-blue-600/20 flex items-center justify-center shrink-0">
-                              <Package size={14} className="text-blue-600" />
-                            </div>
-                            <span className="text-[10px] text-gray-300 truncate flex-1">{file.name}</span>
-                            <button 
-                              type="button"
-                              onClick={() => removeFile(idx)}
-                              className="text-gray-500 hover:text-red-500 transition-colors"
-                            >
-                              <X size={14} />
-                            </button>
+                {/* Selected Files Preview with Alt Text Input */}
+                {imageFile && Array.isArray(imageFile) && imageFile.length > 0 && (
+                  <div className="space-y-3 mt-3">
+                    <div className="text-[10px] text-gray-400">Selected images ({imageFile.length})</div>
+                    {imageFile.map((file, idx) => (
+                      <div key={idx} className="bg-white/5 rounded-lg p-3 border border-white/10">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-12 h-12 rounded bg-blue-600/20 flex items-center justify-center shrink-0">
+                            <Package size={20} className="text-blue-600" />
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="relative group bg-white/5 rounded-lg p-2 flex items-center gap-2 border border-white/5">
-                        <div className="w-8 h-8 rounded bg-blue-600/20 flex items-center justify-center shrink-0">
-                          <Package size={14} className="text-blue-600" />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[11px] text-gray-300 truncate block">{file.name}</span>
+                            <span className="text-[9px] text-gray-500">{(file.size / 1024).toFixed(1)}KB</span>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={() => removeFile(idx)}
+                            className="text-gray-500 hover:text-red-500 transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
                         </div>
-                        <span className="text-[10px] text-gray-300 truncate flex-1">{imageFile.name}</span>
-                        <button 
-                          type="button"
-                          onClick={() => setImageFile(null)}
-                          className="text-gray-500 hover:text-red-500 transition-colors"
-                        >
-                          <X size={14} />
-                        </button>
+                        {/* 🔥 ALT TEXT INPUT */}
+                        <div className="mt-2">
+                          <label className="text-[10px] text-gray-400 block mb-1">Alt Text (for SEO)</label>
+                          <input
+                            type="text"
+                            value={imageAltTexts[idx] || ""}
+                            onChange={(e) => handleAltTextChange(idx, e.target.value)}
+                            placeholder="Describe the image for SEO and accessibility"
+                            className="w-full text-xs bg-[#0f1724] border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-orange-500"
+                          />
+                          <p className="text-[8px] text-gray-500 mt-1">Helps search engines understand the image</p>
+                        </div>
                       </div>
-                    )}
+                    ))}
                   </div>
                 )}
               </div>
@@ -380,7 +482,7 @@ const AddModal = ({
                 Processing...
               </>
             ) : (
-              `Save ${activeMenu === "Main Categories" ? "Main Category" : activeMenu.slice(0, -1)}`
+              `Save ${activeMenu === "Main Categories" ? "Category" : activeMenu.slice(0, -1)}`
             )}
           </button>
         </form>

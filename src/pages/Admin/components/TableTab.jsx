@@ -1,5 +1,5 @@
 import React from "react";
-import { Search, Plus, Edit2, Trash2, Eye, Building2 } from "lucide-react";
+import { Search, Plus, Edit2, Trash2, Eye, Building2, Image as ImageIcon } from "lucide-react";
 
 const TableTab = ({
   activeMenu,
@@ -27,6 +27,14 @@ const TableTab = ({
   const filteredCategoryNames = productCategoryNames.filter(name =>
     name.toLowerCase().includes(search.toLowerCase())
   );
+
+  // Helper function to get alt text for product
+  const getProductAltText = (product) => {
+    if (product.images && product.images.length > 0 && product.images[0].alt) {
+      return product.images[0].alt;
+    }
+    return "No alt text";
+  };
 
   return (
     <div className="flex flex-col gap-3 flex-1 overflow-hidden">
@@ -104,10 +112,11 @@ const TableTab = ({
         </div>
 
         <div className="overflow-hidden rounded-lg border border-white/10 flex-1 overflow-y-auto custom-scrollbar">
-          <div className="grid grid-cols-7 bg-white/5 h-[40px] items-center px-4 text-[11px] font-semibold text-gray-300 sticky top-0 z-10">
+          <div className="grid grid-cols-8 bg-white/5 h-[40px] items-center px-4 text-[11px] font-semibold text-gray-300 sticky top-0 z-10">
             <span>ID</span>
             <span className="col-span-2">{activeMenu === "Sub Categories" ? "Subcategory Name" : activeMenu === "Users" ? "Full Name" : activeMenu === "Subscribers" ? "Email / Company" : "Title/Name"}</span>
             <span className="col-span-2">{activeMenu === "Leads" ? "Project & Contact" : activeMenu === "Users" ? "Email & Phone" : activeMenu === "Sub Categories" ? "Main Category" : activeMenu === "Subscribers" ? "Plan / Date" : activeMenu === "Products" ? "Main Category & Sub Category" : "Category & Detail"}</span>
+            {activeMenu === "Products" && <span>Alt Text</span>}
             <span>Status / Info</span>
             <span className="text-right">Actions</span>
           </div>
@@ -239,12 +248,16 @@ const TableTab = ({
             )) : <p className="p-10 text-center text-slate-500 text-xs">No leads found.</p>)}
 
             {activeMenu === "Products" && (getFilteredItems(products).length > 0 ? getFilteredItems(products).map((product) => (
-              <div key={product._id} className="grid grid-cols-7 items-center px-4 h-[62px] border-t border-white/5 text-[10px]">
+              <div key={product._id} className="grid grid-cols-8 items-center px-4 h-[62px] border-t border-white/5 text-[10px]">
                 <span className="font-medium text-white">#{product._id.slice(-6).toUpperCase()}</span>
                 <span className="text-gray-300 col-span-2">{product.title}</span>
                 <span className="text-gray-400 col-span-2 truncate pr-2">
                   <span className="text-blue-600/80 font-medium">{product.category}</span>
                   {product.subcategory && <span className="text-white/40"> &gt; {product.subcategory}</span>}
+                </span>
+                {/* 🔥 ALT TEXT COLUMN */}
+                <span className="text-gray-400 truncate max-w-[120px]" title={getProductAltText(product)}>
+                  {getProductAltText(product)}
                 </span>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-white font-medium">{product.mobileNumber || 'No Phone'}</span>
