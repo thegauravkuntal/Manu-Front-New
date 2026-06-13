@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaEnvelope, FaLock, FaArrowRight, FaHandshake, FaTimes, FaUser, FaPhone } from 'react-icons/fa';
 import { API_BASE_URL } from "../api/config";
+import logo from "../assets/logo.png";
 
 const PartnerLoginModal = ({ isOpen, onClose, initialMode = 'signup' }) => {
   const [isLogin, setIsLogin] = useState(initialMode === 'login');
@@ -154,7 +155,8 @@ const PartnerLoginModal = ({ isOpen, onClose, initialMode = 'signup' }) => {
         <div className="w-full md:w-3/5 p-4 md:p-5 flex flex-col justify-center bg-white overflow-y-auto">
           {showForgotPassword ? (
             <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="mb-3 text-center md:text-left">
+              <div className="text-center mb-3 md:text-left">
+                <img src={logo} alt="UltraClap Logo" className="h-10 mx-auto md:mx-0 object-contain mb-2" />
                 <h3 className="text-base font-bold text-slate-800">Reset Password</h3>
                 <p className="text-slate-400 text-xs">{forgotSent ? 'Check your email inbox.' : 'Enter your email to receive a reset link.'}</p>
               </div>
@@ -214,7 +216,8 @@ const PartnerLoginModal = ({ isOpen, onClose, initialMode = 'signup' }) => {
             </div>
           ) : (
             <>
-              <div className="mb-4 text-center md:text-left">
+              <div className="text-center mb-4 md:text-left">
+                <img src={logo} alt="UltraClap Logo" className="h-10 mx-auto md:mx-0 object-contain mb-2" />
                 <h3 className="text-lg font-bold text-slate-800">Partner {isLogin ? 'Login' : 'Sign Up'}</h3>
                 <p className="text-slate-400 text-xs">{isLogin ? 'Welcome back!' : 'Join our network of manufacturers.'}</p>
               </div>
