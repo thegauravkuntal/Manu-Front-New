@@ -1,0 +1,111 @@
+# DHIPL WEBSITE REQUIREMENT #
+
+✅ Admin Panel me SEO ke liye 
+🔹 A. Page-Level SEO Control (Har Page ke liye)
+
+Hamare har page ke liye ye edit karne ka option milna chahiye:
+
+Meta Title (Dynamic) length 65 Characters tak honi chaiye
+Meta Description length 155 characters tak honi chaiye
+Meta Keywords 
+URL Slug Edit Option
+Canonical URL (Auto Generated)
+Open Graph Tags (og:title, og:description, og:image)
+Schema Markup Add/Edit Option (JSON-LD)
+Breadcrumb Edit Option
+H1 Tag Editable
+All Image Alt Text Editable hona chaiye
+Internal Linking Option editable chaiye
+Image size admin panel me Dikhana Chaiye har pages me
+Image ka size 100Kb se uppar nhi hona chaiye
+website ke home page aur services pages me FAQ bhi hona chaiye
+
+Note:- 1. Aur jo bhi website me cards bante hai uska description me kitne characters hone chaiye ye bhi mention karo aur koi limit nhi lagani.
+2. Sabhi website me Click Analytics bhi hona chaiye sabhi social media and call, Whatsup Button ka.
+3. Website me Admin pannel login karne ka Header me hona chaiye.
+4. Sabhi pages ke banner ka size bhi mention karna hai.
+5. Website me header, footer and countact us jisme location mail id aur phone number sab editable hona chaiye. 
+6. Advance seo me Head code aur Body code dalne ka option hona chaiye.
+7. Social media ke sabhi link editable hona chaiye.
+8. Webite me agr Carrer page hai to vo bhi editable hona chaiye.
+9. H1 website ke har pages ka 1 hi hona chaiye aur vo bhi editable 
+10. 404 page bhi bana kar dena hai.
+
+
+👉 Ye sab dynamic hona chahiye, hardcoded nahi.
+
+🔹 B. Blog Section SEO Control
+
+Blog meta title & description editable (Title aur decription ki length jo uper mention hai wahi rakhni hai)
+Blog me Schema and OG Tag bhi editable hona chaiye
+Canonical Tag Auto Generated ya editable hona chaiye
+Aur internal linking sahi se work hona chaiye
+Image ka size bhi mention hona chaiye
+Publish date & updated date editable
+Blog category & tag structure
+Heading:- H1,2,3,4,5,6 option in description
+Bullet point and Number point working in Description
+
+SEO-friendly URL structure
+Example:
+website.com/blog/keyword-name
+
+✅ Technical SEO 
+🔹 A. Sitemap
+
+Auto-generated XML sitemap
+Sitemap auto-update hona chahiye jab new page add ho
+
+Example:
+
+website.com/sitemap.xml
+
+Robots Meta (index/noindex, follow/nofollow) ye bhi editable hona chaiye
+
+
+🔹 C. URL Structure
+Developer ensure kare:
+
+Clean URLs (no ?id=123 type)
+HTTPS enabled
+WWW / non-WWW proper redirection
+301 Redirect option admin panel me hona chaiye
+
+🔹 D. Speed Optimization (Very Important 🚀)
+Developer:
+
+Image lazy loading
+Webp format support
+CSS & JS minification
+GZIP enabled
+Browser caching
+Core Web Vitals optimization (LCP, CLS, INP improvements)
+Mobile responsiveness perfect
+Website Mobile Friendly honi chaiye
+Website speed Mobile aur Destop me 80+ Honi chaiye (Page speed insight me)
+
+🔹 E. Schema Implementation
+
+Schema Dynamic Developer:
+
+Organization Schema
+Local Business Schema
+Breadcrumb Schema (dynamic)
+FAQ Schema (page wise)
+Article Schema (blog ke liye)
+Review Schema
+Schema JSON-LD format me hona chahiye.
+
+🔹 F. Technical Essentials
+
+Google Search Console verification option
+Google Analytics code paste option
+GTM code paste optionp
+404 SEO optimized and editable page
+
+
+Note:- All the changes implemented in the design house must be reflected on the website. Furthermore, any changes in the design house that were not carried out in accordance with these specifications must also be implemented.
+
+Note:- Har website me ek starting me pop up hona chaiye.
+
+

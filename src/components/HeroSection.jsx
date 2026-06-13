@@ -14,6 +14,8 @@ import {
   FaLinkedin,
 } from "react-icons/fa";
 
+import { API_BASE_URL } from "../api/config";
+
 // 🔥 TRACKING FUNCTION (Direct - No Import Needed)
 const trackClick = async (buttonName) => {
   try {
@@ -28,13 +30,13 @@ const trackClick = async (buttonName) => {
   }
 };
 
-// 🔥 IMAGES (ADD THESE)
+// 🔥 FALLBACK IMAGES
 import img1 from "../assets/manufacturing.jpg";
 import img2 from "../assets/services.jpg";
 import img3 from "../assets/papercup.jpg";
 import img4 from "../assets/doctor.jpg";
 
-const slides = [
+const FALLBACK_SLIDES = [
   {
     img: img1,
     subtitle: " ",
@@ -66,6 +68,7 @@ const Hero = () => {
   const [step, setStep] = useState(0);
   const [pulse, setPulse] = useState(false);
   const [hovered, setHovered] = useState(null);
+  const [slides, setSlides] = useState(FALLBACK_SLIDES);
 
   const nextSlide = () => {
     setCurrent((prev) => (prev + 1) % slides.length);
@@ -77,6 +80,28 @@ const Hero = () => {
     );
   };
 
+  /* 🔥 FETCH SLIDES FROM API */
+  useEffect(() => {
+    const fetchSlides = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/hero`);
+        const data = await res.json();
+        if (data.success && data.slides && data.slides.length > 0) {
+          setSlides(
+            data.slides.map((s) => ({
+              img: s.image,
+              subtitle: s.subtitle || " ",
+              title: s.title,
+              desc: s.desc,
+            }))
+          );
+        }
+      } catch {
+        // use fallback
+      }
+    };
+    fetchSlides();
+  }, []);
   // 🔥 AUTO SLIDE
   useEffect(() => {
     const interval = setInterval(() => {
@@ -120,13 +145,22 @@ const Hero = () => {
 
       {/* 🔥 SLIDES */}
       {slides.map((slide, i) => (
-        <img
-          key={i}
-          src={slide.img}
-          className={`absolute w-full h-full object-cover transition-opacity duration-1000 ${
-            i === current ? "opacity-100" : "opacity-0"
-          }`}
-        />
+        slide.img ? (
+          <img
+            key={i}
+            src={slide.img}
+            className={`absolute w-full h-full object-cover transition-opacity duration-1000 ${
+              i === current ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ) : (
+          <div
+            key={i}
+            className={`absolute w-full h-full bg-gradient-to-br from-[#0B1C2C] via-[#0F2A43] to-[#1E3A8A] transition-opacity duration-1000 ${
+              i === current ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        )
       ))}
 
       {/* 🔥 OVERLAY */}
