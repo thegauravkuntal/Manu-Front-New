@@ -10,6 +10,7 @@ import {
   FaClock,
   FaChevronDown,
   FaChevronUp,
+  FaChevronRight,
 } from "react-icons/fa";
 import { API_BASE_URL } from "../api/config";
 import { trackClick } from "../components/analytics";
@@ -56,7 +57,6 @@ const Footer = () => {
   const [footer, setFooter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [subCategories, setSubCategories] = useState([]);
-  const [showAllSub, setShowAllSub] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("footerData");
@@ -104,9 +104,7 @@ const Footer = () => {
     (c) => c.parentCategory?.title === "Manufacturing"
   );
   const hasMoreSubs = manufacturingSubs.length > 5;
-  const visibleSubs = showAllSub
-    ? manufacturingSubs
-    : manufacturingSubs.slice(0, 5);
+  const visibleSubs = manufacturingSubs.slice(0, 5);
 
   const handleLinkClick = (label) => {
     const route = QUICK_LINK_ROUTES[label];
@@ -209,10 +207,10 @@ const Footer = () => {
           {hasMoreSubs && (
             <button
               type="button"
-              onClick={() => setShowAllSub(!showAllSub)}
+              onClick={() => { navigate('/all-products'); window.scrollTo({ top: 0, behavior: "smooth" }); }}
               className="mt-3 flex items-center gap-1 text-xs font-semibold text-orange-400 hover:text-orange-300 transition"
             >
-              {showAllSub ? <>Show Less <FaChevronUp className="text-[10px]" /></> : <>View All Subcategories <FaChevronDown className="text-[10px]" /></>}
+              View All Subcategories <FaChevronRight className="text-[10px]" />
             </button>
           )}
         </div>
