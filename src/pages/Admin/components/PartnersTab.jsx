@@ -26,7 +26,7 @@ const PartnersTab = ({
     setTogglingBlock(profileId);
     try {
       const token = localStorage.getItem("token");
-      const API_URL = import.meta.env.VITE_API_URL || "https://manu-back-bpob.onrender.com/api";
+      const API_URL = import.meta.env.VITE_API_URL || "https://manu-back-new.onrender.com/api";
       const res = await fetch(`${API_URL}/admin/partner-profiles/${profileId}/block`, {
         method: "PUT",
         headers: {
@@ -50,7 +50,7 @@ const PartnersTab = ({
     setChangingPlan(profileId);
     try {
       const token = localStorage.getItem("token");
-      const API_URL = import.meta.env.VITE_API_URL || "https://manu-back-bpob.onrender.com/api";
+      const API_URL = import.meta.env.VITE_API_URL || "https://manu-back-new.onrender.com/api";
       const res = await fetch(`${API_URL}/admin/partner-profiles/${profileId}`, {
         method: "PUT",
         headers: {

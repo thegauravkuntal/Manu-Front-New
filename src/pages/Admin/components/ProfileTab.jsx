@@ -5,7 +5,7 @@ const ProfileTab = ({
   adminProfile,
   setAdminProfile,
 }) => {
-  const API_URL = import.meta.env.VITE_API_URL || "https://manu-back-bpob.onrender.com/api";
+  const API_URL = import.meta.env.VITE_API_URL || "https://manu-back-new.onrender.com/api";
   
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",

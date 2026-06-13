@@ -45,7 +45,7 @@ const Popup = ({ isOpen, onClose, onSubscribe }) => {
 
     try {
       // Call API to save subscriber
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001/api"}/subscribers`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "https://manu-back-new.onrender.com/api"}/subscribers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
