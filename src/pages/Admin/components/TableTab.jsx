@@ -22,7 +22,8 @@ const TableTab = ({
   categories = [],
   productCategoryNames = [],
   partnerProfiles = [],
-  navigate
+  navigate,
+  handleSEOClick
 }) => {
   const filteredCategoryNames = productCategoryNames.filter(name =>
     name.toLowerCase().includes(search.toLowerCase())
@@ -269,6 +270,7 @@ const TableTab = ({
                       <Eye size={14} />
                     </a>
                   )}
+                  <button onClick={() => handleSEOClick(product)} className="hover:text-green-400 transition-colors" title="SEO Meta Data"><Search size={14} /></button>
                   <button onClick={() => handleEditClick(product)} className="hover:text-blue-400 transition-colors"><Edit2 size={14} /></button>
                   <button onClick={() => handleDelete(product._id, "products")} className="hover:text-red-400 transition-colors"><Trash2 size={14} /></button>
                 </div>

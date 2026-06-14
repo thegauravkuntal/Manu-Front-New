@@ -65,6 +65,7 @@ import HeroTab from "./components/HeroTab";
 import BannerGuideTab from "./components/BannerGuideTab";
 import AnalyticsTab from "./components/AnalyticsTab";
 import RedirectTab from "./components/RedirectTab";
+import ProductSEOModal from "./components/ProductSEOModal";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -88,6 +89,9 @@ const Dashboard = () => {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSEOModalOpen, setIsSEOModalOpen] = useState(false);
+  const [seoProduct, setSeoProduct] = useState(null);
+  const [isSEOUpdating, setIsSEOUpdating] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [formData, setFormData] = useState({
@@ -322,6 +326,41 @@ const Dashboard = () => {
     setIsEditModalOpen(true);
   };
 
+  const handleSEOClick = (product) => {
+    setSeoProduct(product);
+    setIsSEOModalOpen(true);
+  };
+
+  const handleSEOSubmit = async (productId, seoData) => {
+    if (isSEOUpdating) return;
+    try {
+      setIsSEOUpdating(true);
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/products/${productId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(seoData)
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsSEOModalOpen(false);
+        setSeoProduct(null);
+        fetchData();
+        setToast({ message: "SEO meta data updated successfully!", type: "success" });
+      } else {
+        alert(data.msg || "Error updating SEO data");
+      }
+    } catch (err) {
+      console.error("SEO Update Error:", err);
+      alert("Error updating SEO data");
+    } finally {
+      setIsSEOUpdating(false);
+    }
+  };
+
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!editingItem || isSubmitting) return;
@@ -460,7 +499,7 @@ const Dashboard = () => {
           {activeMenu === "Dashboard" && (<OverviewTab stats={stats} setActiveMenu={setActiveMenu} leads={leads} />)}
           
           {activeMenu !== "Dashboard" && activeMenu !== "Profile" && activeMenu !== "Verifications" && activeMenu !== "Partners" && activeMenu !== "Expirations" && activeMenu !== "Footer" && activeMenu !== "FAQ" && activeMenu !== "Testimonials" && activeMenu !== "Cities" && activeMenu !== "Industries" && activeMenu !== "Banner Slider" && activeMenu !== "Hero" && activeMenu !== "Topbar" && activeMenu !== "Navbar" && activeMenu !== "SEO Manager" && activeMenu !== "301 Redirects" && activeMenu !== "Banner Guide" && activeMenu !== "Analytics" && (
-            <TableTab activeMenu={activeMenu} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} setIsAddModalOpen={setIsAddModalOpen} getFilteredItems={getFilteredItems} handleEditClick={handleEditClick} handleDelete={handleDelete} showMainCategory={showMainCategory} navbarId={navbarId} onToggleMainCategoryVisibility={handleToggleMainCategoryVisibility} users={users} services={services} subscribers={subscribers} leads={leads} products={products} categories={categories} productCategoryNames={productCategoryNames} partnerProfiles={partnerProfiles} navigate={navigate} />
+            <TableTab activeMenu={activeMenu} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} setIsAddModalOpen={setIsAddModalOpen} getFilteredItems={getFilteredItems} handleEditClick={handleEditClick} handleDelete={handleDelete} showMainCategory={showMainCategory} navbarId={navbarId} onToggleMainCategoryVisibility={handleToggleMainCategoryVisibility} users={users} services={services} subscribers={subscribers} leads={leads} products={products} categories={categories} productCategoryNames={productCategoryNames} partnerProfiles={partnerProfiles} navigate={navigate} handleSEOClick={handleSEOClick} />
           )}
           
           {activeMenu === "Partners" && (<PartnersTab partnerProfiles={partnerProfiles} getFilteredItems={getFilteredItems} navigate={navigate} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} onRefresh={fetchData} handleEditClick={handleEditClick} />)}
@@ -485,6 +524,7 @@ const Dashboard = () => {
 
       <EditModal isOpen={isEditModalOpen} onClose={() => { setIsEditModalOpen(false); setImageFile(null); }} activeMenu={activeMenu} formData={formData} setFormData={setFormData} imageFile={imageFile} setImageFile={setImageFile} onSubmit={handleEditSubmit} categories={categories} mainCategories={services} partnerProfiles={partnerProfiles} isSubmitting={isSubmitting} />
       <AddModal isOpen={isAddModalOpen} onClose={() => { setIsAddModalOpen(false); setImageFile(null); }} activeMenu={activeMenu} formData={formData} setFormData={setFormData} imageFile={imageFile} setImageFile={setImageFile} onSubmit={handleAddSubmit} categories={categories} mainCategories={services} partnerProfiles={partnerProfiles} isSubmitting={isSubmitting} />
+      <ProductSEOModal isOpen={isSEOModalOpen} onClose={() => { setIsSEOModalOpen(false); setSeoProduct(null); }} product={seoProduct} onSubmit={handleSEOSubmit} isSubmitting={isSEOUpdating} />
 
       <GlobalSearchModal isOpen={showGlobalSearch} onClose={() => { setShowGlobalSearch(false); setGlobalSearchQuery(""); }} searchQuery={globalSearchQuery} setSearchQuery={setGlobalSearchQuery} menuItems={menuItems} users={users} leads={leads} products={products} setActiveMenu={setActiveMenu} handleEditClick={handleEditClick} />
 
