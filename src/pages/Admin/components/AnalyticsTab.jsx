@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Phone, MessageCircle, BarChart3, RefreshCw, Trash2 } from "lucide-react";
-import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa";
 
 const API_URL = "http://localhost:5001/api";
 
@@ -18,6 +18,7 @@ const AnalyticsTab = () => {
     facebook: <FaFacebookF size={16} />,
     instagram: <FaInstagram size={16} />,
     linkedin: <FaLinkedinIn size={16} />,
+    youtube: <FaYoutube size={16} />,
     contact: <MessageCircle size={18} />,
     email: <MessageCircle size={18} />,
   };
@@ -29,6 +30,7 @@ const AnalyticsTab = () => {
     facebook: "Facebook",
     instagram: "Instagram",
     linkedin: "LinkedIn",
+    youtube: "YouTube",
     contact: "Contact Supplier",
     email: "Email",
   };
@@ -40,6 +42,7 @@ const AnalyticsTab = () => {
     facebook: "bg-blue-500/20 text-blue-400 border-blue-500/30",
     instagram: "bg-pink-500/20 text-pink-400 border-pink-500/30",
     linkedin: "bg-sky-500/20 text-sky-400 border-sky-500/30",
+    youtube: "bg-red-500/20 text-red-400 border-red-500/30",
     contact: "bg-purple-500/20 text-purple-400 border-purple-500/30",
     email: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
   };
@@ -95,10 +98,10 @@ const AnalyticsTab = () => {
     return ((count / totalClicks) * 100).toFixed(1);
   };
 
-  // Get all button keys from analytics or use default list
+  // Get all button keys from analytics or use default list - YOUTUBE ADDED
   const buttonKeys = Object.keys(analytics).length > 0 
     ? Object.keys(analytics)
-    : ["call", "whatsapp", "facebook", "instagram", "linkedin", "contact", "email"];
+    : ["call", "whatsapp", "facebook", "instagram", "linkedin", "youtube", "contact", "email"];
 
   if (loading) {
     return (
@@ -158,7 +161,7 @@ const AnalyticsTab = () => {
       <div className="flex-1 overflow-y-auto min-h-0 pr-2 space-y-6">
         
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
           {buttonKeys.map((key) => (
             <div key={key} className={`rounded-xl p-3 border ${buttonColors[key] || "bg-gray-500/20 text-gray-400 border-gray-500/30"}`}>
               <div className="flex items-center gap-2 mb-1">

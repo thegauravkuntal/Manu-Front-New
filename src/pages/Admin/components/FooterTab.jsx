@@ -28,17 +28,35 @@ const FooterTab = ({ onRefresh }) => {
   const [newProjectLink, setNewProjectLink] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("footerData");
-    if (saved) {
+    const loadFooter = async () => {
       try {
-        setFooter(JSON.parse(saved));
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_BASE_URL}/footer`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        const data = await res.json();
+        if (data.success && data.footer && !data.isDefault) {
+          setFooter(data.footer);
+          setLoading(false);
+          return;
+        }
       } catch {
+        // API failed, fall through to localStorage
+      }
+
+      const saved = localStorage.getItem("footerData");
+      if (saved) {
+        try {
+          setFooter(JSON.parse(saved));
+        } catch {
+          setFooter(DEFAULT_FOOTER);
+        }
+      } else {
         setFooter(DEFAULT_FOOTER);
       }
-    } else {
-      setFooter(DEFAULT_FOOTER);
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+    loadFooter();
 
     const fetchCategories = async () => {
       try {
@@ -93,6 +111,7 @@ const FooterTab = ({ onRefresh }) => {
   const handleSave = async () => {
     try {
       setSaving(true);
+      const token = localStorage.getItem("token");
       const data = { ...footer };
       if (logoFile) {
         const reader = new FileReader();
@@ -101,15 +120,57 @@ const FooterTab = ({ onRefresh }) => {
           reader.readAsDataURL(logoFile);
         });
       }
+
+      const body = {
+        about: data.about,
+        facebook: data.facebook,
+        instagram: data.instagram,
+        linkedin: data.linkedin,
+        youtube: data.youtube,
+        phone: data.phone,
+        email: data.email,
+        timing: data.timing,
+        manufacturingHeading: data.manufacturingHeading,
+        manufacturingLinks: data.manufacturingLinks,
+        projectHeading: data.projectHeading,
+        projectLinks: data.projectLinks,
+      };
+
+      let res;
+      if (data._id) {
+        res = await fetch(`${API_BASE_URL}/footer/${data._id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        });
+      } else {
+        res = await fetch(`${API_BASE_URL}/footer`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(body),
+        });
+      }
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.msg || "Failed to save footer");
+
+      if (result.footer?._id) {
+        data._id = result.footer._id;
+      }
+
       localStorage.setItem("footerData", JSON.stringify(data));
       if (onRefresh) onRefresh();
-      setTimeout(() => {
-        setSaving(false);
-        alert("Footer updated successfully!");
-      }, 300);
+      setSaving(false);
+      alert("Footer updated successfully!");
     } catch (err) {
       console.error("Footer save error:", err);
-      alert("Something went wrong");
+      alert(err.message || "Something went wrong");
       setSaving(false);
     }
   };

@@ -59,17 +59,6 @@ const Footer = () => {
   const [subCategories, setSubCategories] = useState([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("footerData");
-    if (saved) {
-      try {
-        setFooter(JSON.parse(saved));
-      } catch {
-        setFooter(DEFAULT_FOOTER);
-      }
-      setLoading(false);
-      return;
-    }
-
     const fetchFooter = async () => {
       try {
         const [footerRes, catRes] = await Promise.all([
@@ -82,8 +71,18 @@ const Footer = () => {
 
         if (footerRes.ok && footerData.success && footerData.footer) {
           setFooter(footerData.footer);
+          localStorage.setItem("footerData", JSON.stringify(footerData.footer));
         } else {
-          setFooter(DEFAULT_FOOTER);
+          const saved = localStorage.getItem("footerData");
+          if (saved) {
+            try {
+              setFooter(JSON.parse(saved));
+            } catch {
+              setFooter(DEFAULT_FOOTER);
+            }
+          } else {
+            setFooter(DEFAULT_FOOTER);
+          }
         }
 
         if (catData.success) {
@@ -91,7 +90,16 @@ const Footer = () => {
         }
       } catch (err) {
         console.error("Footer fetch error:", err);
-        setFooter(DEFAULT_FOOTER);
+        const saved = localStorage.getItem("footerData");
+        if (saved) {
+          try {
+            setFooter(JSON.parse(saved));
+          } catch {
+            setFooter(DEFAULT_FOOTER);
+          }
+        } else {
+          setFooter(DEFAULT_FOOTER);
+        }
       } finally {
         setLoading(false);
       }

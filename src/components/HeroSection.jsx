@@ -12,6 +12,7 @@ import {
   FaInstagram,
   FaYoutube,
   FaLinkedin,
+  FaFacebook,
 } from "react-icons/fa";
 
 import { API_BASE_URL } from "../api/config";
@@ -138,6 +139,7 @@ const Hero = () => {
     { icon: <FaInstagram />, name: "Instagram", color: "text-pink-500", buttonName: "instagram" },
     { icon: <FaYoutube />, name: "YouTube", color: "text-red-600", buttonName: "youtube" },
     { icon: <FaLinkedin />, name: "LinkedIn", color: "text-blue-600", buttonName: "linkedin" },
+    { icon: <FaFacebook />, name: "Facebook", color: "text-blue-600", buttonName: "facebook" },
   ];
 
   return (
